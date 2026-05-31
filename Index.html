@@ -19,15 +19,18 @@
   --mo:'JetBrains Mono',monospace;--sa:'Space Grotesk',sans-serif;--r:8px;
 }
 body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh;font-size:14px}
-.topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:10}
+.topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:20}
 .logo{width:26px;height:26px;background:var(--ac);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
 .title{font-size:13px;font-weight:600;letter-spacing:.02em}
 .sub{font-size:10px;color:var(--t2);font-family:var(--mo);margin-left:auto}
-.stepper{display:flex;align-items:center;padding:12px 28px;border-bottom:1px solid var(--bd);gap:0}
+.stepper{display:flex;align-items:center;padding:12px 28px;border-bottom:1px solid var(--bd);gap:0;position:sticky;top:55px;background:var(--bg);z-index:19}
 .st{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);font-family:var(--mo);white-space:nowrap}
 .st.active{color:var(--ac)}.st.done{color:var(--gn)}
 .st-n{width:18px;height:18px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
 .st-line{flex:1;height:1px;background:var(--bd);margin:0 8px;min-width:20px}
+/* Sticky action bar — visible on screen 2 only */
+.actionbar{padding:9px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;position:sticky;top:98px;background:var(--bg);z-index:18;flex-wrap:wrap}
+.ab-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .main{padding:22px 28px;max-width:1200px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .uz{background:var(--s1);border:1px dashed var(--bd2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;position:relative}
@@ -82,15 +85,23 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
 .brd{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.25)}
 .bgn{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:560px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:600px;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
 .mhdr{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .mhdr h3{font-size:12px;font-weight:600;font-family:var(--mo);color:var(--t2)}
 .mcls{background:none;border:none;color:var(--mu);cursor:pointer;font-size:20px;line-height:1;padding:0 4px}
 .mcls:hover{color:var(--t1)}
 .mbdy{padding:18px;overflow-y:auto;flex:1}
 .epre{font-size:12px;font-family:var(--mo);color:var(--t1);white-space:pre-wrap;line-height:1.7;background:var(--s2);border-radius:6px;padding:14px}
+.etarea{font-size:12px;font-family:var(--mo);color:var(--t1);white-space:pre-wrap;line-height:1.7;background:var(--s2);border:1px solid var(--bd2);border-radius:6px;padding:14px;width:100%;resize:vertical;min-height:340px;outline:none}
+.etarea:focus{border-color:var(--ac)}
 .emeta{font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s2);border-radius:6px;padding:10px 12px;margin-bottom:12px;line-height:2}
 .emeta strong{color:var(--t1)}
+.tpl-hint{font-size:12px;color:var(--t2);background:var(--s2);border-radius:6px;padding:12px 14px;margin-bottom:12px;line-height:1.6}
+.tpl-hint p{margin-bottom:8px;font-size:11px;color:var(--mu);font-family:var(--mo)}
+.tpl-tokens{display:flex;flex-wrap:wrap;gap:8px}
+.tpl-token{display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--bd2);border-radius:6px;padding:5px 10px}
+.tpl-token code{font-family:var(--mo);font-size:11px;color:var(--ac)}
+.tpl-token span{font-size:11px;color:var(--t2)}
 .mftr{padding:12px 18px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px}
 .confirm-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:20px 24px;display:flex;flex-direction:column;gap:14px}
 .confirm-title{font-size:15px;font-weight:700}
@@ -126,6 +137,16 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   <div class="st" id="s2"><div class="st-n">2</div>Preview</div>
   <div class="st-line"></div>
   <div class="st" id="s3"><div class="st-n">3</div>Send</div>
+</div>
+
+<!-- STICKY ACTION BAR — shown only on screen 2 -->
+<div class="actionbar" id="actionbar" style="display:none">
+  <button class="btn btn-gh btn-sm" onclick="goUpload()">← Re-upload</button>
+  <button class="btn btn-gn btn-sm" id="btn-send-top" onclick="showConfirm()" disabled>Send Emails →</button>
+  <span style="font-size:11px;color:var(--mu);font-family:var(--mo)" id="send-hint-top"></span>
+  <div class="ab-right">
+    <button class="btn btn-gh btn-sm" onclick="showTemplateModal()">✉ Preview &amp; Edit Mail</button>
+  </div>
 </div>
 
 <div class="main" id="main">
@@ -194,11 +215,6 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
     <div class="stats" id="stats-row"></div>
     <div class="twrap" id="table-nc"></div>
     <div class="twrap" id="table-c"></div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <button class="btn btn-gh" onclick="goUpload()">← Re-upload</button>
-      <button class="btn btn-gn" id="btn-send" onclick="showConfirm()">Send Emails →</button>
-      <span style="font-size:11px;color:var(--mu);font-family:var(--mo)" id="send-hint"></span>
-    </div>
   </div>
 
   <!-- SCREEN 3: DONE -->
@@ -207,7 +223,8 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
       <div class="done-icon">✅</div>
       <div class="done-title" id="done-title">Done!</div>
       <div class="done-grid" id="done-grid"></div>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
+        <button class="btn btn-gh" onclick="goPreview()">← Back to Preview</button>
         <button class="btn btn-gh" onclick="goUpload()">Process another week</button>
       </div>
     </div>
@@ -233,7 +250,7 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   </div>
 </div>
 
-<!-- EMAIL PREVIEW MODAL -->
+<!-- EMAIL PREVIEW MODAL (per employee) -->
 <div class="overlay" id="overlay-preview" style="display:none" onclick="if(event.target===this)closePreview()">
   <div class="modal">
     <div class="mhdr"><h3 id="prev-name">EMAIL PREVIEW</h3><button class="mcls" onclick="closePreview()">×</button></div>
@@ -245,12 +262,76 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   </div>
 </div>
 
+<!-- TEMPLATE EDITOR MODAL -->
+<div class="overlay" id="overlay-template" style="display:none" onclick="if(event.target===this)closeTemplateModal()">
+  <div class="modal" style="width:660px">
+    <div class="mhdr">
+      <h3>PREVIEW &amp; EDIT EMAIL TEMPLATE</h3>
+      <button class="mcls" onclick="closeTemplateModal()">×</button>
+    </div>
+    <div class="mbdy">
+      <div class="tpl-hint">
+        <p>AVAILABLE TOKENS — replaced automatically per employee</p>
+        <div class="tpl-tokens">
+          <div class="tpl-token"><code>{{name}}</code><span>Employee's full name</span></div>
+          <div class="tpl-token"><code>{{weekLabel}}</code><span>Week date range</span></div>
+          <div class="tpl-token"><code>{{breakdown}}</code><span>Mon–Fri day-by-day summary</span></div>
+          <div class="tpl-token"><code>{{total}}</code><span>Total effective days (e.g. 2)</span></div>
+          <div class="tpl-token"><code>{{missing}}</code><span>Shortfall (e.g. 1 day)</span></div>
+        </div>
+      </div>
+      <textarea class="etarea" id="tpl-textarea" spellcheck="false"></textarea>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-gh btn-sm" onclick="resetTemplate()">Reset to default</button>
+      <button class="btn btn-gh btn-sm" onclick="closeTemplateModal()">Cancel</button>
+      <button class="btn btn-gn btn-sm" onclick="saveTemplate()">Save template</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const files = { chennai: null, bangalore: null, zoho: null, ullen: null, excuse: null };
-// FIX: track file extensions so server knows how to decode each file
 const fileExts = { chennai: "xlsx", bangalore: "csv", zoho: "xls", ullen: "csv", excuse: "xlsx" };
 const required = ["chennai","bangalore","zoho","ullen"];
 let results = [], weekdays = [], weekLabel = "", selected = new Set();
+
+const DEFAULT_TEMPLATE = `Dear {{name}},
+
+This is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).
+
+Your attendance summary for the week of {{weekLabel}}:
+
+{{breakdown}}
+
+  Total effective days : {{total}} / 5
+  Required             : 3 / 5
+  Shortfall            : {{missing}}
+
+If you believe this is incorrect, please reach out to your manager or HR.
+
+Going forward, please ensure you are present in the office for at least 3 working days each week.
+
+Regards,
+HR & Administration`;
+
+let emailTemplate = DEFAULT_TEMPLATE;
+
+// Build email body for a given employee using the current template
+function buildBody(r) {
+  const lbl = {office:"✓  Office",leave:"✓  Leave",half_leave:"✓  Half-day leave",excuse:"✓  Approved excuse",absent:"✗  Absent",remote:"✗  Remote (not counted)"};
+  const breakdown = weekdays.map((d,i) => {
+    const t = r.dayBreakdown[d]?.type || "absent";
+    return `  ${DAY_NAMES[i].padEnd(4)}  ${lbl[t] || "✗  Absent"}`;
+  }).join("\n");
+  const missing = Math.max(0, 3 - r.total);
+  return emailTemplate
+    .replace(/\{\{name\}\}/g, r.name)
+    .replace(/\{\{weekLabel\}\}/g, weekLabel)
+    .replace(/\{\{breakdown\}\}/g, breakdown)
+    .replace(/\{\{total\}\}/g, r.total)
+    .replace(/\{\{missing\}\}/g, missing + " day" + (missing !== 1 ? "s" : ""));
+}
 
 function updateWeekDisplay() {
   const s = document.getElementById("wstart").value;
@@ -271,7 +352,6 @@ function drop(e, key) { e.preventDefault(); undrag(key); const f = e.dataTransfe
 function fileChosen(key, inp) { if (inp.files[0]) readFile(key, inp.files[0]); }
 
 function readFile(key, file) {
-  // Capture file extension for server-side decoding
   const ext = file.name.split(".").pop().toLowerCase();
   fileExts[key] = ext;
   const reader = new FileReader();
@@ -308,7 +388,7 @@ function processFiles() {
     zohoB64:      files.zoho,
     ullenB64:     files.ullen,
     excuseB64:    files.excuse || null,
-    fileTypes:    { ...fileExts },   // pass extensions to server
+    fileTypes:    { ...fileExts },
     weekStart:    document.getElementById("wstart").value,
     weekEnd:      document.getElementById("wend").value,
   };
@@ -351,7 +431,9 @@ const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri"];
 function renderPreview() {
   setStep(2);
   document.getElementById("screen-upload").style.display = "none";
+  document.getElementById("screen-done").style.display = "none";
   document.getElementById("screen-preview").style.display = "";
+  document.getElementById("actionbar").style.display = "flex";
 
   const nc = results.filter(r => !r.compliant);
   const cp = results.filter(r =>  r.compliant);
@@ -434,27 +516,34 @@ function toggleAll(cb) {
 }
 
 function updateSendBtn() {
-  const btn = document.getElementById("btn-send");
-  const hint = document.getElementById("send-hint");
-  btn.disabled = selected.size === 0;
-  hint.textContent = selected.size === 0 ? "No employees selected" : `${selected.size} email${selected.size!==1?"s":""} will be sent`;
+  const btns = [document.getElementById("btn-send-top")];
+  const hints = [document.getElementById("send-hint-top")];
+  btns.forEach(b => { if(b) b.disabled = selected.size === 0; });
+  hints.forEach(h => { if(h) h.textContent = selected.size === 0 ? "No employees selected" : `${selected.size} email${selected.size!==1?"s":""} will be sent`; });
 }
 
 function showEmailPreview(r) {
-  const lbl = {office:"✓  Office",leave:"✓  Leave",half_leave:"✓  Half-day leave",excuse:"✓  Approved excuse",absent:"✗  Absent",remote:"✗  Remote (not counted)"};
-  const lines = weekdays.map((d,i) => {
-    const t = r.dayBreakdown[d]?.type || "absent";
-    return `  ${DAY_NAMES[i].padEnd(4)}  ${lbl[t] || "✗  Absent"}`;
-  }).join("\n");
-  const missing = Math.max(0, 3 - r.total);
-  const body = `Dear ${r.name},\n\nThis is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).\n\nYour attendance summary for the week of ${weekLabel}:\n\n${lines}\n\n  Total effective days : ${r.total} / 5\n  Required             : 3 / 5\n  Shortfall            : ${missing} day${missing!==1?"s":""}\n\nIf you believe this is incorrect, please reach out to your manager or HR.\n\nGoing forward, please ensure you are present in the office for at least 3 working days each week.\n\nRegards,\nHR & Administration`;
-
   document.getElementById("prev-name").textContent = "EMAIL PREVIEW — " + r.name;
+  const missing = Math.max(0, 3 - r.total);
   document.getElementById("prev-meta").innerHTML = `<strong>To:</strong> ${r.email||'<span style="color:var(--rd)">no email on record</span>'}<br><strong>Subject:</strong> Office Attendance Reminder — Week of ${weekLabel}<br><strong>Score:</strong> ${r.total} / 5 &nbsp;·&nbsp; <strong>Shortfall:</strong> ${missing} day(s)`;
-  document.getElementById("prev-body").textContent = body;
+  document.getElementById("prev-body").textContent = buildBody(r);
   document.getElementById("overlay-preview").style.display = "flex";
 }
 function closePreview() { document.getElementById("overlay-preview").style.display = "none"; }
+
+// ── TEMPLATE EDITOR ───────────────────────────────────────────
+function showTemplateModal() {
+  document.getElementById("tpl-textarea").value = emailTemplate;
+  document.getElementById("overlay-template").style.display = "flex";
+}
+function closeTemplateModal() { document.getElementById("overlay-template").style.display = "none"; }
+function saveTemplate() {
+  emailTemplate = document.getElementById("tpl-textarea").value;
+  closeTemplateModal();
+}
+function resetTemplate() {
+  document.getElementById("tpl-textarea").value = DEFAULT_TEMPLATE;
+}
 
 function showConfirm() {
   const toSend = results.filter(r => !r.compliant && selected.has(r.id));
@@ -482,7 +571,12 @@ function doSend() {
       document.getElementById("prog-bar").style.background = "var(--rd)";
       document.getElementById("confirm-actions").style.display = "flex";
     })
-    .sendEmails({ results: results.filter(r => !r.compliant && selected.has(r.id)), weekLabel, weekdays });
+    .sendEmails({
+      results: results.filter(r => !r.compliant && selected.has(r.id)),
+      weekLabel,
+      weekdays,
+      emailTemplate,
+    });
 }
 
 function onSent(res) {
@@ -490,6 +584,7 @@ function onSent(res) {
   closeConfirm();
   if (!res.ok) { showError(res.error); return; }
   setStep(3);
+  document.getElementById("actionbar").style.display = "none";
   document.getElementById("screen-preview").style.display = "none";
   document.getElementById("screen-done").style.display = "";
   document.getElementById("done-title").textContent = `Done — ${res.sent} email${res.sent!==1?"s":""} sent`;
@@ -512,10 +607,19 @@ function onSent(res) {
     <tbody>${logRows}</tbody></table>`;
 }
 
+function goPreview() {
+  document.getElementById("screen-done").style.display = "none";
+  document.getElementById("screen-upload").style.display = "none";
+  document.getElementById("screen-preview").style.display = "";
+  document.getElementById("actionbar").style.display = "flex";
+  setStep(2);
+}
+
 function goUpload() {
   document.getElementById("screen-preview").style.display = "none";
   document.getElementById("screen-done").style.display = "none";
   document.getElementById("screen-upload").style.display = "";
+  document.getElementById("actionbar").style.display = "none";
   setStep(1);
 }
 

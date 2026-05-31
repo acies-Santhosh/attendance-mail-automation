@@ -89,33 +89,41 @@ function processFiles(payload) {
 
     const ft = fileTypes || {};
 
-    const chennaiSheets = decodeFile(chennaiB64, ft.chennai || "xlsx");
-    const chennai = parseChennaiData(chennaiSheets);
-    Logger.log("=== CHENNAI DEBUG ===");
-    Logger.log("Script timezone: " + Session.getScriptTimeZone());
-    const _ws = chennaiSheets[Object.keys(chennaiSheets)[0]];
-    if (_ws && _ws[0]) Logger.log("Chennai header[0..8]: " + JSON.stringify(_ws[0].slice(0,9).map(h => ({ v: String(h), t: typeof h, isDate: h instanceof Date }))));
-    Logger.log("Chennai parsed keys (first 3 employees): " + JSON.stringify(Object.keys(chennai).slice(0,3)));
-    const _sampleId = Object.keys(chennai)[0];
-    if (_sampleId) Logger.log("Chennai[" + _sampleId + "]: " + JSON.stringify(chennai[_sampleId]));
-    Logger.log("Chennai['1348']: " + JSON.stringify(chennai['1348'] || "NOT FOUND"));
-    const bangalore = parseBangaloreData(
+    const { attendance: chennai, employees: chennaiEmps } = parseChennaiData(
+      decodeFile(chennaiB64, ft.chennai || "xlsx"),
+    );
+    const { attendance: bangalore, employees: bangaloreEmps } = parseBangaloreData(
       decodeFile(bangaloreB64, ft.bangalore || "csv"),
     );
-    const { leaveMap: zoho, emailMap } = parseZohoData(
+    const { leaveMap: zoho, emailMap, employees: zohoEmps } = parseZohoData(
       decodeFile(zohoB64, ft.zoho || "xls"),
     );
-    const { officeMap: ullen, employees } = parseUllenAyyahData(
+    const { officeMap: ullen, employees: ullenEmps } = parseUllenAyyahData(
       decodeFile(ullenB64, ft.ullen || "csv"),
     );
     const excuse = excuseB64
       ? parseExcuseData(decodeFile(excuseB64, ft.excuse || "xlsx"))
       : {};
 
+    // Merge employees from all sources — Ullen Ayyah first (has email),
+    // then Zoho, then Chennai/Bangalore biometric.
+    const seenIds = new Set();
+    const employees = [];
+    const isSystemRow = e => /license@/i.test(e.email || "") || /acies\s*global/i.test(e.name || "");
+    for (const e of ullenEmps) {
+      if (!seenIds.has(e.id) && !isSystemRow(e)) { seenIds.add(e.id); employees.push(e); }
+    }
+    for (const e of [...zohoEmps, ...chennaiEmps, ...bangaloreEmps]) {
+      if (!seenIds.has(e.id) && e.name && !isSystemRow(e)) {
+        seenIds.add(e.id);
+        employees.push({ ...e, email: e.email || emailMap[e.id] || "" });
+      }
+    }
+
     if (!employees || employees.length === 0)
       return {
         ok: false,
-        error: "No employees found in Ullen Ayyah file. Check the format.",
+        error: "No employees found across any file. Check the format.",
       };
 
     const weekdays = getWeekdays(weekStart, weekEnd);
@@ -147,7 +155,7 @@ function processFiles(payload) {
 
 function sendEmails(payload) {
   try {
-    const { results, weekLabel, weekdays } = payload;
+    const { results, weekLabel, weekdays, emailTemplate } = payload;
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const rs =
@@ -178,7 +186,7 @@ function sendEmails(payload) {
             GmailApp.sendEmail(
               r.email,
               `Office Attendance Reminder — Week of ${weekLabel}`,
-              buildEmailBody(r, weekLabel, weekdays, dayNames),
+              buildEmailBody(r, weekLabel, weekdays, dayNames, emailTemplate),
             );
             emailStatus = "Sent";
             sentAt = now.toLocaleString();
@@ -445,22 +453,24 @@ const halfDay = (s) => (s.startsWith("0.5") ? 0.5 : 0);
 // Columns: Employee, First Name, Last Name, Seating Location, [date cols...], No. of Days, Remarks, Status
 // Cell values: "09:45" = in office, "EL"/"SCL" = leave, blank/NaN = absent
 function parseChennaiData(sheets) {
-  const result = {};
+  const attendance = {};
+  const employees = [];
   const ws = sheets[Object.keys(sheets)[0]];
-  if (!ws || ws.length < 2) return result;
+  if (!ws || ws.length < 2) return { attendance, employees };
 
   const hdr = ws[0];
 
-  // Find Employee ID column — header is literally "Employee" in their file
   let iId = hdr.findIndex((h) => {
-    const s = String(h || "")
-      .trim()
-      .toLowerCase();
+    const s = String(h || "").trim().toLowerCase();
     return s === "employee" || s === "employee id" || s.includes("employee id");
   });
-  if (iId < 0) return result; // safety
+  if (iId < 0) return { attendance, employees };
 
-  // Find date columns using parseColDate (which now handles Date objects too)
+  // Find First Name / Last Name columns for building full name
+  const iFirst = hdr.findIndex(h => /first\s*name/i.test(String(h||"")));
+  const iLast  = hdr.findIndex(h => /last\s*name/i.test(String(h||"")));
+  const iName  = hdr.findIndex(h => /^name$/i.test(String(h||"").trim()));
+
   const dateCols = [];
   for (let c = 0; c < hdr.length; c++) {
     const d = parseColDate(hdr[c], 2026);
@@ -471,19 +481,26 @@ function parseChennaiData(sheets) {
     const row = ws[i];
     const empId = normId(row[iId]);
     if (!empId) continue;
-    if (!result[empId]) result[empId] = {};
 
+    // Build name from First+Last or Name column
+    let name = "";
+    if (iFirst >= 0 || iLast >= 0) {
+      const f = String(row[iFirst] || "").trim();
+      const l = String(row[iLast]  || "").trim();
+      name = [f, l].filter(Boolean).join(" ");
+    } else if (iName >= 0) {
+      name = String(row[iName] || "").trim();
+    }
+    if (name) employees.push({ id: empId, name, email: "" });
+
+    if (!attendance[empId]) attendance[empId] = {};
     for (const { col, date } of dateCols) {
       const val = row[col];
       let entry;
       if (val === null || val === "" || val === undefined) {
         entry = { type: "absent" };
       } else if (val instanceof Date) {
-        // Time stored as a Date object in Google Sheets (e.g. 1899-12-30 09:45:00)
-        entry = {
-          type: "office",
-          value: Utilities.formatDate(val, "UTC", "HH:mm"),
-        };
+        entry = { type: "office", value: Utilities.formatDate(val, "UTC", "HH:mm") };
       } else {
         const s = String(val).trim().toUpperCase();
         if (s === "" || s === "NAN") {
@@ -493,16 +510,15 @@ function parseChennaiData(sheets) {
         } else if (isTime(s)) {
           entry = { type: "office", value: s };
         } else if (s.length > 0) {
-          // Non-empty, non-leave string → treat as office (e.g. any time format variation)
           entry = { type: "office", value: s };
         } else {
           entry = { type: "absent" };
         }
       }
-      result[empId][date] = entry;
+      attendance[empId][date] = entry;
     }
   }
-  return result;
+  return { attendance, employees };
 }
 
 // ── DEBUG HELPER (run manually from Apps Script editor, paste a Chennai file ID) ──
@@ -534,15 +550,13 @@ function debugChennai() {
 }
 
 function parseBangaloreData(sheets) {
-  const result = {};
+  const attendance = {};
+  const employees = [];
   const ws = sheets[Object.keys(sheets)[0]];
-  if (!ws || ws.length < 2) return result;
+  if (!ws || ws.length < 2) return { attendance, employees };
   const hdr = ws[0];
-  const iId = hdr.findIndex((h) =>
-    String(h || "")
-      .toLowerCase()
-      .includes("employee id"),
-  );
+  const iId   = hdr.findIndex(h => String(h||"").toLowerCase().includes("employee id"));
+  const iName = hdr.findIndex(h => /employee\s*name/i.test(String(h||"")) || /^name$/i.test(String(h||"").trim()));
   const dateCols = [];
   for (let c = 0; c < hdr.length; c++) {
     const d = parseColDate(hdr[c], 2026);
@@ -552,19 +566,19 @@ function parseBangaloreData(sheets) {
     const row = ws[i];
     const empId = normId(row[iId]);
     if (!empId) continue;
+    const name = iName >= 0 ? String(row[iName] || "").trim() : "";
+    if (name) employees.push({ id: empId, name, email: "" });
     for (const { col, date } of dateCols) {
-      const s = String(row[col] || "")
-        .trim()
-        .toUpperCase();
+      const s = String(row[col] || "").trim().toUpperCase();
       let entry;
       if (s === "WFO") entry = { type: "office" };
       else if (LEAVE_CODES.has(s)) entry = { type: "leave", value: 1 };
       else entry = { type: "absent" };
-      if (!result[empId]) result[empId] = {};
-      result[empId][date] = entry;
+      if (!attendance[empId]) attendance[empId] = {};
+      attendance[empId][date] = entry;
     }
   }
-  return result;
+  return { attendance, employees };
 }
 
 function parseZohoData(sheets) {
@@ -585,33 +599,26 @@ function parseZohoData(sheets) {
       break;
     }
   }
-  if (hdrRow < 0) return { leaveMap, emailMap };
+  if (hdrRow < 0) return { leaveMap, emailMap, employees: [] };
   const hdr = ws[hdrRow];
-  const iId = hdr.findIndex((h) =>
-    String(h || "")
-      .toLowerCase()
-      .includes("employee id"),
-  );
-  const iEmail = hdr.findIndex((h) =>
-    String(h || "")
-      .toLowerCase()
-      .includes("email"),
-  );
+  const iId    = hdr.findIndex(h => String(h||"").toLowerCase().includes("employee id"));
+  const iEmail = hdr.findIndex(h => String(h||"").toLowerCase().includes("email"));
+  const iName  = hdr.findIndex(h => /employee\s*name/i.test(String(h||"")) || /^name$/i.test(String(h||"").trim()));
   const dateCols = [];
   for (let c = 0; c < hdr.length; c++) {
     const d = parseColDate(hdr[c], 2026);
     if (d) dateCols.push({ col: c, date: d });
   }
+  const employees = [];
   for (let i = hdrRow + 1; i < ws.length; i++) {
     const row = ws[i];
     const empId = normId(row[iId]);
     if (!empId) continue;
-    if (iEmail >= 0 && row[iEmail])
-      emailMap[empId] = String(row[iEmail]).trim();
+    if (iEmail >= 0 && row[iEmail]) emailMap[empId] = String(row[iEmail]).trim();
+    const name = iName >= 0 ? String(row[iName] || "").trim() : "";
+    if (name) employees.push({ id: empId, name, email: emailMap[empId] || "" });
     for (const { col, date } of dateCols) {
-      const s = String(row[col] || "")
-        .trim()
-        .toUpperCase();
+      const s = String(row[col] || "").trim().toUpperCase();
       if (s === "-" || s === "") continue;
       const h = halfDay(s);
       let entry;
@@ -622,7 +629,7 @@ function parseZohoData(sheets) {
       if (!leaveMap[empId][date]) leaveMap[empId][date] = entry;
     }
   }
-  return { leaveMap, emailMap };
+  return { leaveMap, emailMap, employees };
 }
 
 function parseUllenAyyahData(sheets) {
@@ -767,7 +774,7 @@ function computeCompliance(
 }
 
 // ── EMAIL BUILDER ─────────────────────────────────────────────
-function buildEmailBody(emp, weekLabel, weekdays, dayNames) {
+function buildEmailBody(emp, weekLabel, weekdays, dayNames, customTemplate) {
   const lbl = {
     office: "✓  Office",
     leave: "✓  Leave",
@@ -776,12 +783,21 @@ function buildEmailBody(emp, weekLabel, weekdays, dayNames) {
     absent: "✗  Absent",
     remote: "✗  Remote (not counted)",
   };
-  const lines = weekdays
+  const breakdown = weekdays
     .map((d, i) => {
       const t = emp.dayBreakdown[d]?.type || "absent";
       return `  ${dayNames[i].padEnd(4)}  ${lbl[t] || "✗  Absent"}`;
     })
     .join("\n");
   const missing = Math.max(0, 3 - emp.total);
-  return `Dear ${emp.name},\n\nThis is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).\n\nYour attendance summary for the week of ${weekLabel}:\n\n${lines}\n\n  Total effective days : ${emp.total} / 5\n  Required             : 3 / 5\n  Shortfall            : ${missing} day${missing !== 1 ? "s" : ""}\n\nIf you believe this is incorrect, please reach out to your manager or HR.\n\nGoing forward, please ensure you are present in the office for at least 3 working days each week.\n\nRegards,\nHR & Administration`;
+  const missingStr = missing + " day" + (missing !== 1 ? "s" : "");
+  if (customTemplate) {
+    return customTemplate
+      .replace(/\{\{name\}\}/g, emp.name)
+      .replace(/\{\{weekLabel\}\}/g, weekLabel)
+      .replace(/\{\{breakdown\}\}/g, breakdown)
+      .replace(/\{\{total\}\}/g, emp.total)
+      .replace(/\{\{missing\}\}/g, missingStr);
+  }
+  return `Dear ${emp.name},\n\nThis is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).\n\nYour attendance summary for the week of ${weekLabel}:\n\n${breakdown}\n\n  Total effective days : ${emp.total} / 5\n  Required             : 3 / 5\n  Shortfall            : ${missingStr}\n\nIf you believe this is incorrect, please reach out to your manager or HR.\n\nGoing forward, please ensure you are present in the office for at least 3 working days each week.\n\nRegards,\nHR & Administration`;
 }
