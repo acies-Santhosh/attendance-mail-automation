@@ -756,10 +756,11 @@ function computeCompliance(
       total += score;
       dayBreakdown[date] = { score, type };
     }
+    const roundedTotal = Math.ceil(total);
     return {
       ...emp,
-      total,
-      compliant: total >= CONFIG.MIN_OFFICE_DAYS,
+      total: roundedTotal,
+      compliant: roundedTotal >= CONFIG.MIN_OFFICE_DAYS,
       dayBreakdown,
     };
   });
