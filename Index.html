@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080a0d;--s1:#0f1217;--s2:#161b22;
+  --bd:#21262d;--bd2:#30363d;
+  --ac:#e6a817;--acd:rgba(230,168,23,.12);
+  --gn:#3fb950;--gnd:rgba(63,185,80,.12);
+  --rd:#f85149;--rdd:rgba(248,81,73,.1);
+  --pu:#bc8cff;--pud:rgba(188,140,255,.12);
+  --bl:#58a6ff;
+  --t1:#e6edf3;--t2:#8b949e;--mu:#484f58;
+  --mo:'JetBrains Mono',monospace;--sa:'Space Grotesk',sans-serif;--r:8px;
+}
+body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh;font-size:14px}
+.topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:10}
+.logo{width:26px;height:26px;background:var(--ac);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.title{font-size:13px;font-weight:600;letter-spacing:.02em}
+.sub{font-size:10px;color:var(--t2);font-family:var(--mo);margin-left:auto}
+.stepper{display:flex;align-items:center;padding:12px 28px;border-bottom:1px solid var(--bd);gap:0}
+.st{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);font-family:var(--mo);white-space:nowrap}
+.st.active{color:var(--ac)}.st.done{color:var(--gn)}
+.st-n{width:18px;height:18px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.st-line{flex:1;height:1px;background:var(--bd);margin:0 8px;min-width:20px}
+.main{padding:22px 28px;max-width:1200px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.uz{background:var(--s1);border:1px dashed var(--bd2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;position:relative}
+.uz:hover{border-color:var(--ac);background:var(--s2)}
+.uz.loaded{border-style:solid;border-color:var(--gn)}
+.uz.drag{border-color:var(--ac);background:var(--acd)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.uz-tag{font-size:9px;font-family:var(--mo);color:var(--mu);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.uz-label{font-size:13px;font-weight:600;margin-bottom:2px}
+.uz-desc{font-size:11px;color:var(--t2);margin-bottom:7px;line-height:1.5}
+.uz-status{font-size:11px;font-family:var(--mo);color:var(--mu)}
+.uz-status.ok{color:var(--gn)}
+.week-row{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:11px 14px;flex-wrap:wrap}
+.wl{font-size:11px;color:var(--t2);font-family:var(--mo);white-space:nowrap}
+.week-row input[type=date]{background:var(--s2);border:1px solid var(--bd2);color:var(--t1);font-family:var(--mo);font-size:12px;padding:5px 8px;border-radius:5px;outline:none}
+.week-row input[type=date]:focus{border-color:var(--ac)}
+.wdisp{font-size:12px;color:var(--ac);font-family:var(--mo);margin-left:auto}
+.err{background:var(--rdd);border:1px solid var(--rd);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--rd);font-family:var(--mo);white-space:pre-wrap;line-height:1.6}
+.btn{padding:9px 18px;border-radius:var(--r);font-family:var(--sa);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;letter-spacing:.01em;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-ac{background:var(--ac);color:#000}.btn-ac:not(:disabled):hover{opacity:.88}
+.btn-gh{background:transparent;border:1px solid var(--bd2);color:var(--t2)}.btn-gh:hover{border-color:var(--t1);color:var(--t1)}
+.btn-gn{background:var(--gn);color:#000}.btn-gn:not(:disabled):hover{opacity:.88}
+.btn-rd{background:var(--rd);color:#fff}.btn-rd:not(:disabled):hover{opacity:.88}
+.btn-sm{padding:5px 10px;font-size:11px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.scard{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;flex:1;min-width:90px}
+.sval{font-size:22px;font-weight:700;line-height:1;margin-bottom:2px}
+.sval.ac{color:var(--ac)}.sval.rd{color:var(--rd)}.sval.gn{color:var(--gn)}
+.slbl{font-size:10px;color:var(--t2);font-family:var(--mo)}
+.twrap{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;overflow-x:auto}
+.tbar{padding:9px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbar-title{font-size:11px;font-weight:600;color:var(--t2);font-family:var(--mo);text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+thead th{padding:8px 12px;text-align:left;font-family:var(--mo);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);background:var(--s2);border-bottom:1px solid var(--bd);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--s2)}
+tbody tr.nc{border-left:2px solid var(--rd)}
+td{padding:8px 12px;vertical-align:middle}
+td.nm{font-weight:600;font-size:13px;white-space:nowrap}
+td.mo{font-family:var(--mo);font-size:11px;color:var(--t2)}
+td.rb{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--rd)}
+td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
+.dp{font-size:9px;font-family:var(--mo);padding:2px 6px;border-radius:20px;white-space:nowrap;display:inline-block}
+.po{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
+.pl{background:var(--acd);color:var(--ac);border:1px solid rgba(230,168,23,.25)}
+.pe{background:var(--pud);color:var(--pu);border:1px solid rgba(188,140,255,.25)}
+.pa{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.2)}
+.pr{background:rgba(88,166,255,.1);color:var(--bl);border:1px solid rgba(88,166,255,.2)}
+.badge{font-size:10px;font-family:var(--mo);padding:2px 8px;border-radius:20px;display:inline-block}
+.brd{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.25)}
+.bgn{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:560px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.mhdr{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.mhdr h3{font-size:12px;font-weight:600;font-family:var(--mo);color:var(--t2)}
+.mcls{background:none;border:none;color:var(--mu);cursor:pointer;font-size:20px;line-height:1;padding:0 4px}
+.mcls:hover{color:var(--t1)}
+.mbdy{padding:18px;overflow-y:auto;flex:1}
+.epre{font-size:12px;font-family:var(--mo);color:var(--t1);white-space:pre-wrap;line-height:1.7;background:var(--s2);border-radius:6px;padding:14px}
+.emeta{font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s2);border-radius:6px;padding:10px 12px;margin-bottom:12px;line-height:2}
+.emeta strong{color:var(--t1)}
+.mftr{padding:12px 18px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px}
+.confirm-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.confirm-title{font-size:15px;font-weight:700}
+.confirm-sub{font-size:12px;color:var(--t2);line-height:1.6}
+.confirm-list{background:var(--s2);border-radius:6px;padding:12px 14px;max-height:200px;overflow-y:auto}
+.confirm-list-item{font-size:12px;font-family:var(--mo);color:var(--t1);padding:3px 0;border-bottom:1px solid var(--bd)}
+.confirm-list-item:last-child{border-bottom:none}
+.confirm-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.prog-wrap{background:var(--s2);border-radius:4px;height:4px;overflow:hidden;margin-top:6px;width:100%}
+.prog-bar{height:100%;background:var(--gn);transition:width .4s;border-radius:4px}
+.done-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:36px;text-align:center}
+.done-icon{font-size:44px;margin-bottom:14px}
+.done-title{font-size:20px;font-weight:700;margin-bottom:8px;color:var(--gn)}
+.done-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.done-stat{background:var(--s2);border-radius:var(--r);padding:12px;text-align:center}
+.done-stat .n{font-size:24px;font-weight:700}
+.done-stat .l{font-size:10px;color:var(--t2);font-family:var(--mo);margin-top:2px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:sp .6s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">AC</div>
+  <div class="title">Attendance Compliance</div>
+  <div class="sub">Acies Global · weekly review</div>
+</div>
+
+<div class="stepper" id="stepper">
+  <div class="st active" id="s1"><div class="st-n">1</div>Upload</div>
+  <div class="st-line"></div>
+  <div class="st" id="s2"><div class="st-n">2</div>Preview</div>
+  <div class="st-line"></div>
+  <div class="st" id="s3"><div class="st-n">3</div>Send</div>
+</div>
+
+<div class="main" id="main">
+
+  <!-- SCREEN 1: UPLOAD -->
+  <div id="screen-upload">
+    <div class="upload-grid">
+      <div class="uz" id="uz-chennai" ondragover="drag(event,'chennai')" ondragleave="undrag('chennai')" ondrop="drop(event,'chennai')">
+        <input type="file" id="f-chennai" onchange="fileChosen('chennai',this)">
+        <div class="uz-tag">Master · Biometric</div>
+        <div class="uz-label">Chennai Attendance</div>
+        <div class="uz-desc">Single sheet · Employee + date columns · time = in office, EL/SCL = leave</div>
+        <div class="uz-status" id="st-chennai">Click or drag to upload</div>
+      </div>
+      <div class="uz" id="uz-bangalore" ondragover="drag(event,'bangalore')" ondragleave="undrag('bangalore')" ondrop="drop(event,'bangalore')">
+        <input type="file" id="f-bangalore" onchange="fileChosen('bangalore',this)">
+        <div class="uz-tag">Master · Manual entry</div>
+        <div class="uz-label">Bangalore Attendance</div>
+        <div class="uz-desc">CSV or XLSX · WFO / SCL / MSL per date column</div>
+        <div class="uz-status" id="st-bangalore">Click or drag to upload</div>
+      </div>
+      <div class="uz" id="uz-zoho" ondragover="drag(event,'zoho')" ondragleave="undrag('zoho')" ondrop="drop(event,'zoho')">
+        <input type="file" id="f-zoho" onchange="fileChosen('zoho',this)">
+        <div class="uz-tag">Secondary · Zoho export</div>
+        <div class="uz-label">Zoho Leave Report</div>
+        <div class="uz-desc">XLS / XLSX · EL / SCL / ML / MSL / LWP · half-day codes supported</div>
+        <div class="uz-status" id="st-zoho">Click or drag to upload</div>
+      </div>
+      <div class="uz" id="uz-ullen" ondragover="drag(event,'ullen')" ondragleave="undrag('ullen')" ondrop="drop(event,'ullen')">
+        <input type="file" id="f-ullen" onchange="fileChosen('ullen',this)">
+        <div class="uz-tag">Secondary · Regularisation</div>
+        <div class="uz-label">Ullen Ayyah Report</div>
+        <div class="uz-desc">CSV / XLSX · WFC / WFB / WFCO / WR / L per date · employee master</div>
+        <div class="uz-status" id="st-ullen">Click or drag to upload</div>
+      </div>
+    </div>
+
+    <div class="uz" id="uz-excuse" ondragover="drag(event,'excuse')" ondragleave="undrag('excuse')" ondrop="drop(event,'excuse')">
+      <input type="file" id="f-excuse" onchange="fileChosen('excuse',this)">
+      <div class="uz-tag">Optional · Permissions</div>
+      <div class="uz-label">Excuse / Permitted WFH Sheet</div>
+      <div class="uz-desc">Employee ID + Date — manager-approved absences that count toward 3 days</div>
+      <div class="uz-status" id="st-excuse">Optional — click or drag to upload</div>
+    </div>
+
+    <div class="week-row">
+      <span class="wl">WEEK START (Mon)</span>
+      <input type="date" id="wstart" value="2026-05-18" onchange="updateWeekDisplay()">
+      <span class="wl">WEEK END (Fri)</span>
+      <input type="date" id="wend" value="2026-05-22" onchange="updateWeekDisplay()">
+      <div class="wdisp" id="wdisp"></div>
+    </div>
+
+    <div id="upload-error" class="err" style="display:none"></div>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-ac" id="btn-process" onclick="processFiles()" disabled>
+        Process &amp; Preview →
+      </button>
+      <span id="upload-hint" style="font-size:11px;color:var(--mu);font-family:var(--mo)">4 required files needed</span>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: PREVIEW -->
+  <div id="screen-preview" style="display:none">
+    <div class="stats" id="stats-row"></div>
+    <div class="twrap" id="table-nc"></div>
+    <div class="twrap" id="table-c"></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-gh" onclick="goUpload()">← Re-upload</button>
+      <button class="btn btn-gn" id="btn-send" onclick="showConfirm()">Send Emails →</button>
+      <span style="font-size:11px;color:var(--mu);font-family:var(--mo)" id="send-hint"></span>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: DONE -->
+  <div id="screen-done" style="display:none">
+    <div class="done-card">
+      <div class="done-icon">✅</div>
+      <div class="done-title" id="done-title">Done!</div>
+      <div class="done-grid" id="done-grid"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
+        <button class="btn btn-gh" onclick="goUpload()">Process another week</button>
+      </div>
+    </div>
+    <div class="twrap" id="table-log"></div>
+  </div>
+
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="overlay" id="overlay-confirm" style="display:none" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-box" style="max-width:520px;width:95vw">
+    <div class="confirm-title">Send compliance emails?</div>
+    <div class="confirm-sub" id="confirm-sub"></div>
+    <div class="confirm-list" id="confirm-list"></div>
+    <div id="progress-area" style="display:none">
+      <div style="font-size:12px;color:var(--t2);font-family:var(--mo)" id="prog-label">Sending…</div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+    </div>
+    <div class="confirm-actions" id="confirm-actions">
+      <button class="btn btn-gn" id="btn-confirm-send" onclick="doSend()">Yes, send emails</button>
+      <button class="btn btn-gh" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL PREVIEW MODAL -->
+<div class="overlay" id="overlay-preview" style="display:none" onclick="if(event.target===this)closePreview()">
+  <div class="modal">
+    <div class="mhdr"><h3 id="prev-name">EMAIL PREVIEW</h3><button class="mcls" onclick="closePreview()">×</button></div>
+    <div class="mbdy">
+      <div class="emeta" id="prev-meta"></div>
+      <pre class="epre" id="prev-body"></pre>
+    </div>
+    <div class="mftr"><button class="btn btn-gh btn-sm" onclick="closePreview()">Close</button></div>
+  </div>
+</div>
+
+<script>
+const files = { chennai: null, bangalore: null, zoho: null, ullen: null, excuse: null };
+// FIX: track file extensions so server knows how to decode each file
+const fileExts = { chennai: "xlsx", bangalore: "csv", zoho: "xls", ullen: "csv", excuse: "xlsx" };
+const required = ["chennai","bangalore","zoho","ullen"];
+let results = [], weekdays = [], weekLabel = "", selected = new Set();
+
+function updateWeekDisplay() {
+  const s = document.getElementById("wstart").value;
+  const e = document.getElementById("wend").value;
+  if (s && e) {
+    const fmt = d => new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+    const yr = new Date(e+"T00:00:00").toLocaleDateString("en-IN",{year:"numeric"});
+    document.getElementById("wdisp").textContent = `${fmt(s)} – ${fmt(e)} ${yr}`;
+    weekLabel = `${fmt(s)} – ${fmt(e)} ${yr}`;
+  }
+  checkReady();
+}
+updateWeekDisplay();
+
+function drag(e, key) { e.preventDefault(); document.getElementById("uz-"+key).classList.add("drag"); }
+function undrag(key) { document.getElementById("uz-"+key).classList.remove("drag"); }
+function drop(e, key) { e.preventDefault(); undrag(key); const f = e.dataTransfer.files[0]; if (f) readFile(key, f); }
+function fileChosen(key, inp) { if (inp.files[0]) readFile(key, inp.files[0]); }
+
+function readFile(key, file) {
+  // Capture file extension for server-side decoding
+  const ext = file.name.split(".").pop().toLowerCase();
+  fileExts[key] = ext;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    files[key] = ev.target.result.split(",")[1];
+    const el = document.getElementById("uz-"+key);
+    el.classList.add("loaded"); el.classList.remove("drag");
+    const st = document.getElementById("st-"+key);
+    st.textContent = "✓  " + file.name;
+    st.className = "uz-status ok";
+    checkReady();
+  };
+  reader.readAsDataURL(file);
+}
+
+function checkReady() {
+  const allFiles = required.every(k => files[k]);
+  const btn = document.getElementById("btn-process");
+  const hint = document.getElementById("upload-hint");
+  btn.disabled = !allFiles;
+  if (allFiles) hint.textContent = "Ready — click to process";
+  else hint.textContent = `${required.filter(k=>!files[k]).length} required file(s) still needed`;
+}
+
+function processFiles() {
+  const btn = document.getElementById("btn-process");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Processing…';
+  document.getElementById("upload-error").style.display = "none";
+
+  const payload = {
+    chennaiB64:   files.chennai,
+    bangaloreB64: files.bangalore,
+    zohoB64:      files.zoho,
+    ullenB64:     files.ullen,
+    excuseB64:    files.excuse || null,
+    fileTypes:    { ...fileExts },   // pass extensions to server
+    weekStart:    document.getElementById("wstart").value,
+    weekEnd:      document.getElementById("wend").value,
+  };
+
+  google.script.run
+    .withSuccessHandler(onProcessed)
+    .withFailureHandler(onError)
+    .processFiles(payload);
+}
+
+function onProcessed(res) {
+  const btn = document.getElementById("btn-process");
+  btn.disabled = false; btn.innerHTML = "Process &amp; Preview →";
+  if (!res.ok) { showError(res.error); return; }
+  results = res.results; weekdays = res.weekdays;
+  renderPreview();
+}
+
+function onError(err) {
+  const btn = document.getElementById("btn-process");
+  btn.disabled = false; btn.innerHTML = "Process &amp; Preview →";
+  showError(err.message || String(err));
+}
+
+function showError(msg) {
+  const el = document.getElementById("upload-error");
+  el.textContent = msg; el.style.display = "block";
+}
+
+const TYPE_PILL = {
+  office:     '<span class="dp po">Office</span>',
+  leave:      '<span class="dp pl">Leave</span>',
+  half_leave: '<span class="dp pl">½ Leave</span>',
+  excuse:     '<span class="dp pe">Excused</span>',
+  absent:     '<span class="dp pa">Absent</span>',
+  remote:     '<span class="dp pr">Remote</span>',
+};
+const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri"];
+
+function renderPreview() {
+  setStep(2);
+  document.getElementById("screen-upload").style.display = "none";
+  document.getElementById("screen-preview").style.display = "";
+
+  const nc = results.filter(r => !r.compliant);
+  const cp = results.filter(r =>  r.compliant);
+  selected = new Set(nc.map(r => r.id));
+
+  document.getElementById("stats-row").innerHTML = `
+    <div class="scard"><div class="sval ac">${results.length}</div><div class="slbl">total employees</div></div>
+    <div class="scard"><div class="sval rd">${nc.length}</div><div class="slbl">non-compliant</div></div>
+    <div class="scard"><div class="sval gn">${cp.length}</div><div class="slbl">compliant</div></div>
+    <div class="scard"><div class="sval ac" id="sel-count">${nc.length}</div><div class="slbl">selected to email</div></div>
+  `;
+
+  const dayThs = weekdays.map((d,i) => {
+    const label = new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+    return `<th>${DAY_NAMES[i]} · ${label}</th>`;
+  }).join("");
+
+  const ncRows = nc.length === 0
+    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">🎉 All employees compliant this week</td></tr>`
+    : nc.map(r => `
+      <tr class="nc" id="row-${r.id}">
+        <td><input type="checkbox" id="chk-${r.id}" checked onchange="toggleSelect('${r.id}')" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer"></td>
+        <td class="nm">${r.name}</td>
+        <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
+        <td class="rb">${r.total} / 5</td>
+        ${weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")}
+        <td><button class="btn btn-gh btn-sm" onclick='showEmailPreview(${JSON.stringify(r).replace(/'/g,"&apos;")})'>Preview</button></td>
+      </tr>`).join("");
+
+  const allChecked = `<input type="checkbox" id="chk-all" checked onchange="toggleAll(this)" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer">`;
+
+  document.getElementById("table-nc").innerHTML = `
+    <div class="tbar">
+      <span class="tbar-title">Non-compliant</span>
+      <span class="badge brd">${nc.length}</span>
+      <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">check/uncheck to include or exclude</span>
+    </div>
+    <table><thead><tr><th>${allChecked}</th><th>Employee</th><th>Email</th><th>Score</th>${dayThs}<th>Preview</th></tr></thead>
+    <tbody>${ncRows}</tbody></table>`;
+
+  const cpRows = cp.map(r => `
+    <tr>
+      <td class="nm">${r.name}</td>
+      <td class="rg">${r.total} / 5</td>
+      ${weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")}
+    </tr>`).join("");
+
+  document.getElementById("table-c").innerHTML = `
+    <div class="tbar">
+      <span class="tbar-title">Compliant</span>
+      <span class="badge bgn">${cp.length}</span>
+      <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">no emails will be sent</span>
+    </div>
+    <table><thead><tr><th>Employee</th><th>Score</th>${dayThs}</tr></thead>
+    <tbody>${cpRows}</tbody></table>`;
+
+  updateSendBtn();
+}
+
+function toggleSelect(id) {
+  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  updateSendBtn();
+  const nc = results.filter(r => !r.compliant);
+  const allChk = document.getElementById("chk-all");
+  if (allChk) allChk.checked = nc.every(r => selected.has(r.id));
+  const selCount = document.getElementById("sel-count");
+  if (selCount) selCount.textContent = selected.size;
+}
+
+function toggleAll(cb) {
+  const nc = results.filter(r => !r.compliant);
+  nc.forEach(r => {
+    if (cb.checked) selected.add(r.id); else selected.delete(r.id);
+    const chk = document.getElementById("chk-"+r.id);
+    if (chk) chk.checked = cb.checked;
+  });
+  updateSendBtn();
+  const selCount = document.getElementById("sel-count");
+  if (selCount) selCount.textContent = selected.size;
+}
+
+function updateSendBtn() {
+  const btn = document.getElementById("btn-send");
+  const hint = document.getElementById("send-hint");
+  btn.disabled = selected.size === 0;
+  hint.textContent = selected.size === 0 ? "No employees selected" : `${selected.size} email${selected.size!==1?"s":""} will be sent`;
+}
+
+function showEmailPreview(r) {
+  const lbl = {office:"✓  Office",leave:"✓  Leave",half_leave:"✓  Half-day leave",excuse:"✓  Approved excuse",absent:"✗  Absent",remote:"✗  Remote (not counted)"};
+  const lines = weekdays.map((d,i) => {
+    const t = r.dayBreakdown[d]?.type || "absent";
+    return `  ${DAY_NAMES[i].padEnd(4)}  ${lbl[t] || "✗  Absent"}`;
+  }).join("\n");
+  const missing = Math.max(0, 3 - r.total);
+  const body = `Dear ${r.name},\n\nThis is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).\n\nYour attendance summary for the week of ${weekLabel}:\n\n${lines}\n\n  Total effective days : ${r.total} / 5\n  Required             : 3 / 5\n  Shortfall            : ${missing} day${missing!==1?"s":""}\n\nIf you believe this is incorrect, please reach out to your manager or HR.\n\nGoing forward, please ensure you are present in the office for at least 3 working days each week.\n\nRegards,\nHR & Administration`;
+
+  document.getElementById("prev-name").textContent = "EMAIL PREVIEW — " + r.name;
+  document.getElementById("prev-meta").innerHTML = `<strong>To:</strong> ${r.email||'<span style="color:var(--rd)">no email on record</span>'}<br><strong>Subject:</strong> Office Attendance Reminder — Week of ${weekLabel}<br><strong>Score:</strong> ${r.total} / 5 &nbsp;·&nbsp; <strong>Shortfall:</strong> ${missing} day(s)`;
+  document.getElementById("prev-body").textContent = body;
+  document.getElementById("overlay-preview").style.display = "flex";
+}
+function closePreview() { document.getElementById("overlay-preview").style.display = "none"; }
+
+function showConfirm() {
+  const toSend = results.filter(r => !r.compliant && selected.has(r.id));
+  document.getElementById("confirm-sub").innerHTML = `<strong>${toSend.length}</strong> email${toSend.length!==1?"s":""} will be sent from your Gmail to the employees below.`;
+  document.getElementById("confirm-list").innerHTML = toSend.map(r =>
+    `<div class="confirm-list-item">${r.name} &nbsp;<span style="color:var(--t2)">${r.email || "⚠ no email"}</span> &nbsp;<span style="color:var(--rd)">${r.total}/5 days</span></div>`
+  ).join("");
+  document.getElementById("progress-area").style.display = "none";
+  document.getElementById("confirm-actions").style.display = "flex";
+  document.getElementById("overlay-confirm").style.display = "flex";
+}
+
+function closeConfirm() { document.getElementById("overlay-confirm").style.display = "none"; }
+
+function doSend() {
+  document.getElementById("confirm-actions").style.display = "none";
+  document.getElementById("progress-area").style.display = "block";
+  document.getElementById("prog-label").textContent = "Sending emails and writing log…";
+  document.getElementById("prog-bar").style.width = "30%";
+
+  google.script.run
+    .withSuccessHandler(onSent)
+    .withFailureHandler(err => {
+      document.getElementById("prog-label").textContent = "Error: " + (err.message || err);
+      document.getElementById("prog-bar").style.background = "var(--rd)";
+      document.getElementById("confirm-actions").style.display = "flex";
+    })
+    .sendEmails({ results: results.filter(r => !r.compliant && selected.has(r.id)), weekLabel, weekdays });
+}
+
+function onSent(res) {
+  document.getElementById("prog-bar").style.width = "100%";
+  closeConfirm();
+  if (!res.ok) { showError(res.error); return; }
+  setStep(3);
+  document.getElementById("screen-preview").style.display = "none";
+  document.getElementById("screen-done").style.display = "";
+  document.getElementById("done-title").textContent = `Done — ${res.sent} email${res.sent!==1?"s":""} sent`;
+  document.getElementById("done-grid").innerHTML = `
+    <div class="done-stat"><div class="n" style="color:var(--gn)">${res.sent}</div><div class="l">emails sent</div></div>
+    <div class="done-stat"><div class="n" style="color:var(--rd)">${res.failed}</div><div class="l">failed</div></div>
+    <div class="done-stat"><div class="n" style="color:var(--mu)">${res.noEmail}</div><div class="l">no email on record</div></div>
+  `;
+  const nc = results.filter(r => !r.compliant && selected.has(r.id));
+  const logRows = nc.map(r => `
+    <tr>
+      <td class="nm">${r.name}</td>
+      <td class="mo">${r.email||"—"}</td>
+      <td class="mo">${r.total} / 5</td>
+      <td><span class="badge bgn">✓ Sent</span></td>
+    </tr>`).join("");
+  document.getElementById("table-log").innerHTML = `
+    <div class="tbar"><span class="tbar-title">Email log</span><span class="badge brd">${res.sent} sent</span></div>
+    <table><thead><tr><th>Employee</th><th>Email</th><th>Score</th><th>Status</th></tr></thead>
+    <tbody>${logRows}</tbody></table>`;
+}
+
+function goUpload() {
+  document.getElementById("screen-preview").style.display = "none";
+  document.getElementById("screen-done").style.display = "none";
+  document.getElementById("screen-upload").style.display = "";
+  setStep(1);
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById("s"+i);
+    el.className = "st" + (i < n ? " done" : i === n ? " active" : "");
+    el.querySelector(".st-n").textContent = i < n ? "✓" : i;
+  });
+}
+</script>
+</body>
+</html>
