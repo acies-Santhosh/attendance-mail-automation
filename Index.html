@@ -20,9 +20,9 @@
 }
 body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh;font-size:14px}
 .topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:20}
-.logo{width:26px;height:26px;background:var(--ac);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.brand-left{display:flex;align-items:center;gap:10px;flex-shrink:0}.brand-logo{height:28px;width:auto;flex-shrink:0}.brand-name{font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
 .title{font-size:13px;font-weight:600;letter-spacing:.02em}
-.sub{font-size:10px;color:var(--t2);font-family:var(--mo);margin-left:auto}
+.sub{display:none}
 .stepper{display:flex;align-items:center;padding:12px 28px;border-bottom:1px solid var(--bd);gap:0;position:sticky;top:55px;background:var(--bg);z-index:19}
 .st{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);font-family:var(--mo);white-space:nowrap}
 .st.active{color:var(--ac)}.st.done{color:var(--gn)}
@@ -31,13 +31,18 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh
 /* Sticky action bar — visible on screen 2 only */
 .actionbar{padding:9px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;position:sticky;top:98px;background:var(--bg);z-index:18;flex-wrap:wrap}
 .ab-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.exp-wrap{position:relative;display:inline-flex}
+.exp-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);overflow:hidden;z-index:50;min-width:130px;display:none;flex-direction:column}
+.exp-drop.open{display:flex}
+.exp-opt{padding:9px 14px;font-size:12px;font-family:var(--mo);color:var(--t1);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;transition:background .1s}
+.exp-opt:hover{background:var(--bd)}
 .main{padding:22px 28px;max-width:1200px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.uz{background:var(--s1);border:1px dashed var(--bd2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;position:relative}
+.uz{display:block;background:var(--s1);border:1px dashed var(--bd2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s}
 .uz:hover{border-color:var(--ac);background:var(--s2)}
 .uz.loaded{border-style:solid;border-color:var(--gn)}
 .uz.drag{border-color:var(--ac);background:var(--acd)}
-.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.uz input[type=file]{display:none}
 .uz-tag{font-size:9px;font-family:var(--mo);color:var(--mu);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
 .uz-label{font-size:13px;font-weight:600;margin-bottom:2px}
 .uz-desc{font-size:11px;color:var(--t2);margin-bottom:7px;line-height:1.5}
@@ -57,9 +62,16 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh
 .btn-rd{background:var(--rd);color:#fff}.btn-rd:not(:disabled):hover{opacity:.88}
 .btn-sm{padding:5px 10px;font-size:11px}
 .stats{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.scard{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;flex:1;min-width:90px}
+.scard{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;flex:1;min-width:90px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.scard:hover{background:var(--s2)}
+.scard.active-all{border-color:var(--ac);background:var(--acd)}
+.scard.active-nc{border-color:var(--rd);background:var(--rdd)}
+.scard.active-c{border-color:var(--gn);background:var(--gnd)}
+.scard.active-sel{border-color:var(--pu);background:var(--pud)}
+.scard.active-ua{border-color:#f0883e;background:rgba(240,136,62,.1)}
+.scard.active-bio{border-color:var(--pu);background:var(--pud)}
 .sval{font-size:22px;font-weight:700;line-height:1;margin-bottom:2px}
-.sval.ac{color:var(--ac)}.sval.rd{color:var(--rd)}.sval.gn{color:var(--gn)}
+.sval.ac{color:var(--ac)}.sval.rd{color:var(--rd)}.sval.gn{color:var(--gn)}.sval.pu{color:var(--pu)}.sval.bl{color:var(--bl)}.sval.or{color:#f0883e}
 .slbl{font-size:10px;color:var(--t2);font-family:var(--mo)}
 .twrap{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;overflow-x:auto}
 .tbar{padding:9px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -126,9 +138,10 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
 <body>
 
 <div class="topbar">
-  <div class="logo">AC</div>
-  <div class="title">Attendance Compliance</div>
-  <div class="sub">Acies Global · weekly review</div>
+  <div class="brand-left">
+    <span class="brand-name">Acies Global · weekly review</span>
+  </div>
+  <div class="title" style="margin-left:auto">Attendance Compliance</div>
 </div>
 
 <div class="stepper" id="stepper">
@@ -145,6 +158,13 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   <button class="btn btn-gn btn-sm" id="btn-send-top" onclick="showConfirm()" disabled>Send Emails →</button>
   <span style="font-size:11px;color:var(--mu);font-family:var(--mo)" id="send-hint-top"></span>
   <div class="ab-right">
+    <div class="exp-wrap" id="exp-wrap">
+      <button class="btn btn-gh btn-sm" id="btn-export" onclick="toggleExpDrop(event)" disabled title="Click a card first to select a list">↓ Export</button>
+      <div class="exp-drop" id="exp-drop">
+        <div class="exp-opt" onclick="exportList('csv')">📄 Export as CSV</div>
+        <div class="exp-opt" onclick="exportList('xlsx')">📊 Export as XLSX</div>
+      </div>
+    </div>
     <button class="btn btn-gh btn-sm" onclick="showTemplateModal()">✉ Preview &amp; Edit Mail</button>
   </div>
 </div>
@@ -154,43 +174,43 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   <!-- SCREEN 1: UPLOAD -->
   <div id="screen-upload">
     <div class="upload-grid">
-      <div class="uz" id="uz-chennai" ondragover="drag(event,'chennai')" ondragleave="undrag('chennai')" ondrop="drop(event,'chennai')">
-        <input type="file" id="f-chennai" onchange="fileChosen('chennai',this)">
+      <label class="uz" id="uz-chennai" ondragover="drag(event,'chennai')" ondragleave="undrag('chennai')" ondrop="drop(event,'chennai')">
         <div class="uz-tag">Master · Biometric</div>
         <div class="uz-label">Chennai Attendance</div>
         <div class="uz-desc">Single sheet · Employee + date columns · time = in office, EL/SCL = leave</div>
         <div class="uz-status" id="st-chennai">Click or drag to upload</div>
-      </div>
-      <div class="uz" id="uz-bangalore" ondragover="drag(event,'bangalore')" ondragleave="undrag('bangalore')" ondrop="drop(event,'bangalore')">
-        <input type="file" id="f-bangalore" onchange="fileChosen('bangalore',this)">
+        <input type="file" id="f-chennai" onchange="fileChosen('chennai',this)">
+      </label>
+      <label class="uz" id="uz-bangalore" ondragover="drag(event,'bangalore')" ondragleave="undrag('bangalore')" ondrop="drop(event,'bangalore')">
         <div class="uz-tag">Master · Manual entry</div>
         <div class="uz-label">Bangalore Attendance</div>
         <div class="uz-desc">CSV or XLSX · WFO / SCL / MSL per date column</div>
         <div class="uz-status" id="st-bangalore">Click or drag to upload</div>
-      </div>
-      <div class="uz" id="uz-zoho" ondragover="drag(event,'zoho')" ondragleave="undrag('zoho')" ondrop="drop(event,'zoho')">
-        <input type="file" id="f-zoho" onchange="fileChosen('zoho',this)">
+        <input type="file" id="f-bangalore" onchange="fileChosen('bangalore',this)">
+      </label>
+      <label class="uz" id="uz-zoho" ondragover="drag(event,'zoho')" ondragleave="undrag('zoho')" ondrop="drop(event,'zoho')">
         <div class="uz-tag">Secondary · Zoho export</div>
         <div class="uz-label">Zoho Leave Report</div>
         <div class="uz-desc">XLS / XLSX · EL / SCL / ML / MSL / LWP · half-day codes supported</div>
         <div class="uz-status" id="st-zoho">Click or drag to upload</div>
-      </div>
-      <div class="uz" id="uz-ullen" ondragover="drag(event,'ullen')" ondragleave="undrag('ullen')" ondrop="drop(event,'ullen')">
-        <input type="file" id="f-ullen" onchange="fileChosen('ullen',this)">
+        <input type="file" id="f-zoho" onchange="fileChosen('zoho',this)">
+      </label>
+      <label class="uz" id="uz-ullen" ondragover="drag(event,'ullen')" ondragleave="undrag('ullen')" ondrop="drop(event,'ullen')">
         <div class="uz-tag">Secondary · Regularisation</div>
         <div class="uz-label">Ullen Ayyah Report</div>
         <div class="uz-desc">CSV / XLSX · WFC / WFB / WFCO / WR / L per date · employee master</div>
         <div class="uz-status" id="st-ullen">Click or drag to upload</div>
-      </div>
+        <input type="file" id="f-ullen" onchange="fileChosen('ullen',this)">
+      </label>
     </div>
 
-    <div class="uz" id="uz-excuse" ondragover="drag(event,'excuse')" ondragleave="undrag('excuse')" ondrop="drop(event,'excuse')">
-      <input type="file" id="f-excuse" onchange="fileChosen('excuse',this)">
+    <label class="uz" id="uz-excuse" ondragover="drag(event,'excuse')" ondragleave="undrag('excuse')" ondrop="drop(event,'excuse')">
       <div class="uz-tag">Optional · Permissions</div>
       <div class="uz-label">Excuse / Permitted WFH Sheet</div>
       <div class="uz-desc">Employee ID + Date — manager-approved absences that count toward 3 days</div>
       <div class="uz-status" id="st-excuse">Optional — click or drag to upload</div>
-    </div>
+      <input type="file" id="f-excuse" onchange="fileChosen('excuse',this)">
+    </label>
 
     <div class="week-row">
       <span class="wl">WEEK START (Mon)</span>
@@ -213,8 +233,31 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   <!-- SCREEN 2: PREVIEW -->
   <div id="screen-preview" style="display:none">
     <div class="stats" id="stats-row"></div>
-    <div class="twrap" id="table-nc"></div>
-    <div class="twrap" id="table-c"></div>
+    <div id="card-hint" style="font-size:12px;color:var(--mu);font-family:var(--mo);text-align:center;padding:32px 0;">↑ Click a card above to view the list</div>
+    <div class="twrap" id="table-ua"  style="display:none"></div>
+    <div class="twrap" id="table-bio" style="display:none"></div>
+    <div class="twrap" id="table-nc"  style="display:none"></div>
+    <div class="twrap" id="table-c"   style="display:none"></div>
+
+    <!-- EXCLUDED LIST -->
+    <div style="border:1px solid var(--bd);border-radius:var(--r);overflow:hidden">
+      <div onclick="toggleExcluded()" style="padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--s1);user-select:none">
+        <span style="font-size:10px;font-weight:600;font-family:var(--mo);text-transform:uppercase;letter-spacing:.06em;color:var(--mu)">Excluded from compliance</span>
+        <span style="font-size:10px;font-family:var(--mo);background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.25);padding:1px 7px;border-radius:20px">9</span>
+        <span id="exc-arrow" style="font-size:9px;color:var(--mu);margin-left:auto">▼</span>
+      </div>
+      <div id="exc-body" style="display:none;padding:12px 14px;background:var(--s2);flex-wrap:wrap;gap:8px">
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Mukund</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Sundar</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Vijay Krishna</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Kumar</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Shankar</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Kartik</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Anbu</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Vamsi</span>
+        <span style="font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:3px 10px">Keerthana</span>
+      </div>
+    </div>
   </div>
 
   <!-- SCREEN 3: DONE -->
@@ -252,13 +295,23 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
 
 <!-- EMAIL PREVIEW MODAL (per employee) -->
 <div class="overlay" id="overlay-preview" style="display:none" onclick="if(event.target===this)closePreview()">
-  <div class="modal">
-    <div class="mhdr"><h3 id="prev-name">EMAIL PREVIEW</h3><button class="mcls" onclick="closePreview()">×</button></div>
+  <div class="modal" style="width:640px">
+    <div class="mhdr">
+      <h3 id="prev-name">EMAIL PREVIEW</h3>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="prev-edited-badge" style="display:none;font-size:10px;font-family:var(--mo);color:var(--ac);background:var(--acd);border:1px solid rgba(230,168,23,.3);padding:2px 8px;border-radius:20px">edited</span>
+        <button class="mcls" onclick="closePreview()">×</button>
+      </div>
+    </div>
     <div class="mbdy">
       <div class="emeta" id="prev-meta"></div>
-      <pre class="epre" id="prev-body"></pre>
+      <textarea class="etarea" id="prev-body" spellcheck="false" oninput="onPreviewEdit()"></textarea>
     </div>
-    <div class="mftr"><button class="btn btn-gh btn-sm" onclick="closePreview()">Close</button></div>
+    <div class="mftr">
+      <button class="btn btn-gh btn-sm" onclick="resetPreviewBody()">Reset to template</button>
+      <button class="btn btn-gh btn-sm" onclick="closePreview()">Close</button>
+      <button class="btn btn-gn btn-sm" onclick="savePreviewBody()">Save for this employee</button>
+    </div>
   </div>
 </div>
 
@@ -295,6 +348,9 @@ const files = { chennai: null, bangalore: null, zoho: null, ullen: null, excuse:
 const fileExts = { chennai: "xlsx", bangalore: "csv", zoho: "xls", ullen: "csv", excuse: "xlsx" };
 const required = ["chennai","bangalore","zoho","ullen"];
 let results = [], weekdays = [], weekLabel = "", selected = new Set();
+let emailOverrides = {};   // empId → custom body string
+let previewEmpId = null;   // which employee is currently open in preview modal
+let currentFilter = null;  // which card is active ('all','nc','c','sel','fl')
 
 const DEFAULT_TEMPLATE = `Dear {{name}},
 
@@ -425,6 +481,8 @@ const TYPE_PILL = {
   excuse:     '<span class="dp pe">Excused</span>',
   absent:     '<span class="dp pa">Absent</span>',
   remote:     '<span class="dp pr">Remote</span>',
+  flagged_ua:  '<span class="dp" style="background:rgba(240,136,62,.12);color:#f0883e;border:1px solid rgba(240,136,62,.3)">UA Only</span>',
+  flagged_bio: '<span class="dp" style="background:rgba(188,140,255,.12);color:var(--pu);border:1px solid rgba(188,140,255,.3)">Bio Only</span>',
 };
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri"];
 
@@ -435,15 +493,19 @@ function renderPreview() {
   document.getElementById("screen-preview").style.display = "";
   document.getElementById("actionbar").style.display = "flex";
 
-  const nc = results.filter(r => !r.compliant);
-  const cp = results.filter(r =>  r.compliant);
+  const ua  = results.filter(r => r.flagged_ua);
+  const bio = results.filter(r => r.flagged_bio);
+  const nc  = results.filter(r => !r.flagged && !r.compliant);
+  const cp  = results.filter(r => !r.flagged &&  r.compliant);
   selected = new Set(nc.map(r => r.id));
 
   document.getElementById("stats-row").innerHTML = `
-    <div class="scard"><div class="sval ac">${results.length}</div><div class="slbl">total employees</div></div>
-    <div class="scard"><div class="sval rd">${nc.length}</div><div class="slbl">non-compliant</div></div>
-    <div class="scard"><div class="sval gn">${cp.length}</div><div class="slbl">compliant</div></div>
-    <div class="scard"><div class="sval ac" id="sel-count">${nc.length}</div><div class="slbl">selected to email</div></div>
+    <div class="scard" id="card-all" onclick="filterView('all')"><div class="sval ac">${results.length}</div><div class="slbl">total employees</div></div>
+    <div class="scard" id="card-nc"  onclick="filterView('nc')"><div class="sval rd">${nc.length}</div><div class="slbl">non-compliant</div></div>
+    <div class="scard" id="card-c"   onclick="filterView('c')"><div class="sval gn">${cp.length}</div><div class="slbl">compliant</div></div>
+    <div class="scard" id="card-sel" onclick="filterView('sel')"><div class="sval pu" id="sel-count">${nc.length}</div><div class="slbl">selected to email</div></div>
+    <div class="scard" id="card-ua"  onclick="filterView('ua')"><div class="sval or">${ua.length}</div><div class="slbl">UA defaulters</div></div>
+    <div class="scard" id="card-bio" onclick="filterView('bio')"><div class="sval pu">${bio.length}</div><div class="slbl">bio defaulters</div></div>
   `;
 
   const dayThs = weekdays.map((d,i) => {
@@ -490,8 +552,175 @@ function renderPreview() {
     <table><thead><tr><th>Employee</th><th>Score</th>${dayThs}</tr></thead>
     <tbody>${cpRows}</tbody></table>`;
 
+  const flaggedRow = (r, scoreColor) => `
+      <tr>
+        <td class="nm">${r.name}</td>
+        <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
+        <td style="font-family:var(--mo);font-size:13px;font-weight:700;color:${scoreColor}">${r.total} / 5</td>
+        ${weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")}
+      </tr>`;
+
+  const uaRows = ua.length === 0
+    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">No UA defaulters this week</td></tr>`
+    : ua.map(r => flaggedRow(r, "#f0883e")).join("");
+
+  const bioRows = bio.length === 0
+    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">No biometric defaulters this week</td></tr>`
+    : bio.map(r => flaggedRow(r, "var(--pu)")).join("");
+
+  document.getElementById("table-ua").innerHTML = `
+    <div class="tbar">
+      <span class="tbar-title">UA Defaulters</span>
+      <span class="badge" style="background:rgba(240,136,62,.1);color:#f0883e;border:1px solid rgba(240,136,62,.3)">${ua.length}</span>
+      <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">WFC/WFB in Ullen Ayyah but no biometric record</span>
+    </div>
+    <table><thead><tr><th>Employee</th><th>Email</th><th>Score</th>${dayThs}</tr></thead>
+    <tbody>${uaRows}</tbody></table>`;
+
+  document.getElementById("table-bio").innerHTML = `
+    <div class="tbar">
+      <span class="tbar-title">Bio Defaulters</span>
+      <span class="badge" style="background:var(--pud);color:var(--pu);border:1px solid rgba(188,140,255,.3)">${bio.length}</span>
+      <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">Biometric office recorded but not marked in Ullen Ayyah</span>
+    </div>
+    <table><thead><tr><th>Employee</th><th>Email</th><th>Score</th>${dayThs}</tr></thead>
+    <tbody>${bioRows}</tbody></table>`;
+
   updateSendBtn();
+  // Tables hidden — user must click a card to reveal
 }
+
+function filterView(type) {
+  const uaWrap  = document.getElementById("table-ua");
+  const bioWrap = document.getElementById("table-bio");
+  const ncWrap  = document.getElementById("table-nc");
+  const cWrap   = document.getElementById("table-c");
+  const hint    = document.getElementById("card-hint");
+
+  if (hint) hint.style.display = "none";
+  currentFilter = type;
+  const expBtn = document.getElementById("btn-export");
+  if (expBtn) expBtn.disabled = false;
+  ['all','nc','c','sel','ua','bio'].forEach(t => {
+    const card = document.getElementById("card-" + t);
+    if (card) card.className = "scard" + (t === type ? " active-" + t : "");
+  });
+
+  // Hide all, then show what's needed
+  [uaWrap, bioWrap, ncWrap, cWrap].forEach(w => { if(w) w.style.display = "none"; });
+
+  if (type === 'all') {
+    [uaWrap, bioWrap, ncWrap, cWrap].forEach(w => { if(w) w.style.display = ""; });
+    results.filter(r => !r.compliant && !r.flagged).forEach(r => {
+      const row = document.getElementById("row-" + r.id);
+      if (row) row.style.display = "";
+    });
+  } else if (type === 'ua') {
+    uaWrap.style.display = "";
+  } else if (type === 'bio') {
+    bioWrap.style.display = "";
+  } else if (type === 'nc') {
+    ncWrap.style.display = "";
+    results.filter(r => !r.flagged && !r.compliant).forEach(r => {
+      const row = document.getElementById("row-" + r.id);
+      if (row) row.style.display = "";
+    });
+  } else if (type === 'c') {
+    cWrap.style.display = "";
+  } else if (type === 'sel') {
+    ncWrap.style.display = "";
+    results.filter(r => !r.flagged && !r.compliant).forEach(r => {
+      const row = document.getElementById("row-" + r.id);
+      if (row) row.style.display = selected.has(r.id) ? "" : "none";
+    });
+  }
+}
+
+// ── EXPORT ───────────────────────────────────────────────────
+function getExportRows() {
+  const LABELS = { all:'All Employees', nc:'Non-Compliant', c:'Compliant', sel:'Selected to Email', ua:'UA Defaulters', bio:'Bio Defaulters' };
+  let rows;
+  if (currentFilter === 'ua')       rows = results.filter(r => r.flagged_ua);
+  else if (currentFilter === 'bio') rows = results.filter(r => r.flagged_bio);
+  else if (currentFilter === 'nc')  rows = results.filter(r => !r.flagged && !r.compliant);
+  else if (currentFilter === 'c')   rows = results.filter(r => !r.flagged && r.compliant);
+  else if (currentFilter === 'sel') rows = results.filter(r => !r.flagged && !r.compliant && selected.has(r.id));
+  else                               rows = results; // 'all'
+  const label = LABELS[currentFilter] || 'Export';
+  return { rows, label };
+}
+
+function buildExportData(rows) {
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri'];
+  const headers = ['Employee ID','Employee Name','Email','Week','Mon','Tue','Wed','Thu','Fri','Total Days','Compliant','UA Defaulter','Bio Defaulter','Status'];
+  const data = rows.map(r => {
+    const dayVals = weekdays.map(d => r.dayBreakdown[d]?.type || 'absent');
+    let status = r.flagged_ua ? 'UA Defaulter' : r.flagged_bio ? 'Bio Defaulter' : r.compliant ? 'Compliant' : 'Non-Compliant';
+    return [
+      r.id, r.name, r.email || '', weekLabel,
+      ...dayVals,
+      r.total,
+      r.flagged ? '—' : (r.compliant ? 'Yes' : 'No'),
+      r.flagged_ua  ? 'Yes' : 'No',
+      r.flagged_bio ? 'Yes' : 'No',
+      status,
+    ];
+  });
+  return { headers, data };
+}
+
+function exportList(format) {
+  closeExpDrop();
+  if (!currentFilter) return;
+  const { rows, label } = getExportRows();
+  if (!rows.length) { alert('No data in this list to export.'); return; }
+  const { headers, data } = buildExportData(rows);
+  const safeName = label.replace(/\s+/g,'_') + '_' + weekLabel.replace(/[^a-zA-Z0-9]/g,'-');
+
+  if (format === 'csv') {
+    const escape = v => { const s = String(v ?? ''); return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g,'""') + '"' : s; };
+    const csv = [headers, ...data].map(row => row.map(escape).join(',')).join('\r\n');
+    downloadBlob(new Blob([csv], { type: 'text/csv' }), safeName + '.csv');
+  } else {
+    // Load SheetJS lazily — only when XLSX export is actually needed
+    if (typeof XLSX !== 'undefined') {
+      doXlsxExport(headers, data, label, safeName);
+    } else {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+      s.onload = () => doXlsxExport(headers, data, label, safeName);
+      s.onerror = () => alert('Could not load XLSX library. Please try CSV instead.');
+      document.head.appendChild(s);
+    }
+  }
+}
+
+function doXlsxExport(headers, data, label, safeName) {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+  XLSX.utils.book_append_sheet(wb, ws, label.slice(0, 31));
+  XLSX.writeFile(wb, safeName + '.xlsx');
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+function toggleExpDrop(e) {
+  e.stopPropagation();
+  document.getElementById('exp-drop').classList.toggle('open');
+}
+function closeExpDrop() {
+  const d = document.getElementById('exp-drop');
+  if (d) d.classList.remove('open');
+}
+window.addEventListener('load', function() {
+  document.addEventListener('click', closeExpDrop);
+});
 
 function toggleSelect(id) {
   if (selected.has(id)) selected.delete(id); else selected.add(id);
@@ -501,6 +730,8 @@ function toggleSelect(id) {
   if (allChk) allChk.checked = nc.every(r => selected.has(r.id));
   const selCount = document.getElementById("sel-count");
   if (selCount) selCount.textContent = selected.size;
+  const activeCard = document.querySelector(".scard[class*='active-']");
+  if (activeCard && activeCard.id === "card-sel") filterView('sel');
 }
 
 function toggleAll(cb) {
@@ -513,6 +744,8 @@ function toggleAll(cb) {
   updateSendBtn();
   const selCount = document.getElementById("sel-count");
   if (selCount) selCount.textContent = selected.size;
+  const activeCard = document.querySelector(".scard[class*='active-']");
+  if (activeCard && activeCard.id === "card-sel") filterView('sel');
 }
 
 function updateSendBtn() {
@@ -523,12 +756,52 @@ function updateSendBtn() {
 }
 
 function showEmailPreview(r) {
+  previewEmpId = r.id;
   document.getElementById("prev-name").textContent = "EMAIL PREVIEW — " + r.name;
   const missing = Math.max(0, 3 - r.total);
   document.getElementById("prev-meta").innerHTML = `<strong>To:</strong> ${r.email||'<span style="color:var(--rd)">no email on record</span>'}<br><strong>Subject:</strong> Office Attendance Reminder — Week of ${weekLabel}<br><strong>Score:</strong> ${r.total} / 5 &nbsp;·&nbsp; <strong>Shortfall:</strong> ${missing} day(s)`;
-  document.getElementById("prev-body").textContent = buildBody(r);
+  const body = emailOverrides[r.id] !== undefined ? emailOverrides[r.id] : buildBody(r);
+  document.getElementById("prev-body").value = body;
+  const badge = document.getElementById("prev-edited-badge");
+  badge.style.display = emailOverrides[r.id] !== undefined ? "inline" : "none";
   document.getElementById("overlay-preview").style.display = "flex";
 }
+
+function onPreviewEdit() {
+  // Show "edited" badge as soon as the user types anything
+  document.getElementById("prev-edited-badge").style.display = "inline";
+}
+
+function savePreviewBody() {
+  if (!previewEmpId) return;
+  emailOverrides[previewEmpId] = document.getElementById("prev-body").value;
+  // Show a small "edited" indicator on the table row
+  const row = document.getElementById("row-" + previewEmpId);
+  if (row) {
+    const nm = row.querySelector(".nm");
+    if (nm && !nm.querySelector(".edit-dot")) {
+      const dot = document.createElement("span");
+      dot.className = "edit-dot";
+      dot.title = "Email edited for this employee";
+      dot.style.cssText = "display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac);margin-left:6px;vertical-align:middle";
+      nm.appendChild(dot);
+    }
+  }
+  closePreview();
+}
+
+function resetPreviewBody() {
+  if (!previewEmpId) return;
+  const r = results.find(e => e.id === previewEmpId);
+  if (!r) return;
+  delete emailOverrides[previewEmpId];
+  document.getElementById("prev-body").value = buildBody(r);
+  document.getElementById("prev-edited-badge").style.display = "none";
+  // Remove dot from row
+  const row = document.getElementById("row-" + previewEmpId);
+  if (row) { const dot = row.querySelector(".edit-dot"); if (dot) dot.remove(); }
+}
+
 function closePreview() { document.getElementById("overlay-preview").style.display = "none"; }
 
 // ── TEMPLATE EDITOR ───────────────────────────────────────────
@@ -576,6 +849,7 @@ function doSend() {
       weekLabel,
       weekdays,
       emailTemplate,
+      emailOverrides,
     });
 }
 
@@ -620,7 +894,19 @@ function goUpload() {
   document.getElementById("screen-done").style.display = "none";
   document.getElementById("screen-upload").style.display = "";
   document.getElementById("actionbar").style.display = "none";
+  currentFilter = null;
+  const expBtn = document.getElementById("btn-export");
+  if (expBtn) { expBtn.disabled = true; }
+  closeExpDrop();
   setStep(1);
+}
+
+function toggleExcluded() {
+  const body = document.getElementById("exc-body");
+  const arrow = document.getElementById("exc-arrow");
+  const open = body.style.display === "flex";
+  body.style.display = open ? "none" : "flex";
+  arrow.textContent = open ? "▼" : "▲";
 }
 
 function setStep(n) {

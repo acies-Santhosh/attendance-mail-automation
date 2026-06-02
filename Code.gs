@@ -109,7 +109,13 @@ function processFiles(payload) {
     // then Zoho, then Chennai/Bangalore biometric.
     const seenIds = new Set();
     const employees = [];
-    const isSystemRow = e => /license@/i.test(e.email || "") || /acies\s*global/i.test(e.name || "");
+    const SYSTEM_NAMES = new Set(["acies global", "acies auditor", "acies", "auditor auditor"]);
+    const SYSTEM_EMAILS = new Set(["license@aciesglobal.com", "auditor@aciesglobal.com"]);
+    const isSystemRow = e => {
+      const name  = (e.name  || "").trim().toLowerCase();
+      const email = (e.email || "").trim().toLowerCase();
+      return SYSTEM_EMAILS.has(email) || SYSTEM_NAMES.has(name);
+    };
     for (const e of ullenEmps) {
       if (!seenIds.has(e.id) && !isSystemRow(e)) { seenIds.add(e.id); employees.push(e); }
     }
@@ -147,120 +153,158 @@ function processFiles(payload) {
       (a, b) => a.compliant - b.compliant || a.name.localeCompare(b.name),
     );
 
+    // Auto-write all employees to Compliance Results sheet immediately
+    writeComplianceSheet(results, weekdays, getWeekLabel(weekStart, weekEnd));
+
     return { ok: true, results, weekdays };
   } catch (e) {
     return { ok: false, error: e.message + "\n" + e.stack };
   }
 }
 
+// ── WEEK LABEL ────────────────────────────────────────────────
+function getWeekLabel(start, end) {
+  const fmt = d => Utilities.formatDate(new Date(d + "T00:00:00"), Session.getScriptTimeZone(), "MMM d");
+  return fmt(start) + " – " + fmt(end);
+}
+
+// ── WRITE ALL EMPLOYEES TO COMPLIANCE RESULTS SHEET ──────────
+function writeComplianceSheet(results, weekdays, weekLabel) {
+  try {
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    let rs = ss.getSheetByName(CONFIG.RESULTS_SHEET);
+    if (!rs) rs = ss.insertSheet(CONFIG.RESULTS_SHEET);
+
+    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+
+    const headers = [
+      "Employee ID", "Employee Name", "Email", "Week",
+      ...dayNames,
+      "Total Days", "Compliant", "Flagged", "Status",
+    ];
+
+    // Build data rows for ALL employees
+    const rows = results.map(r => {
+      const dayVals = weekdays.map(d => r.dayBreakdown[d]?.type || "absent");
+      let status;
+      if (r.flagged_ua)      status = "UA Defaulter";
+      else if (r.flagged_bio)status = "Bio Defaulter";
+      else if (r.compliant)  status = "Compliant";
+      else                   status = "Non-Compliant";
+
+      return [
+        r.id,
+        r.name,
+        r.email || "",
+        weekLabel,
+        ...dayVals,
+        r.total,
+        r.flagged ? "—" : (r.compliant ? "Yes" : "No"),
+        r.flagged ? "Yes" : "No",
+        status,
+      ];
+    });
+
+    // Clear & rewrite sheet
+    rs.clearContents();
+    rs.getRange(1, 1, 1, headers.length)
+      .setValues([headers])
+      .setBackground("#1e2026")
+      .setFontColor("#e6a817")
+      .setFontWeight("bold")
+      .setFontFamily("Courier New");
+    rs.setFrozenRows(1);
+
+    if (rows.length > 0) {
+      rs.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+
+      // Colour-code the Status column (last col)
+      const statusCol = headers.length;
+      for (let i = 0; i < rows.length; i++) {
+        const cell = rs.getRange(i + 2, statusCol);
+        const s = rows[i][statusCol - 1];
+        if (s === "Compliant")          cell.setFontColor("#3fb950");
+        else if (s === "UA Defaulter")  cell.setFontColor("#f0883e");
+        else if (s === "Bio Defaulter") cell.setFontColor("#bc8cff");
+        else                             cell.setFontColor("#f85149");
+      }
+
+      // Auto-resize columns for readability
+      for (let c = 1; c <= headers.length; c++) rs.autoResizeColumn(c);
+    }
+  } catch (e) {
+    Logger.log("writeComplianceSheet error: " + e.message);
+  }
+}
+
 function sendEmails(payload) {
   try {
-    const { results, weekLabel, weekdays, emailTemplate } = payload;
+    const { results, weekLabel, weekdays, emailTemplate, emailOverrides } = payload;
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    const rs =
-      ss.getSheetByName(CONFIG.RESULTS_SHEET) ||
-      ss.insertSheet(CONFIG.RESULTS_SHEET);
     const ls =
       ss.getSheetByName(CONFIG.LOG_SHEET) || ss.insertSheet(CONFIG.LOG_SHEET);
 
     const now = new Date();
-    const sent = [],
-      failed = [],
-      noEmail = [];
-    const resultRows = [],
-      logRows = [];
+    const sent = [], failed = [], noEmail = [];
+    const logRows = [];
 
+    // Only email non-compliant & non-flagged employees (selected subset from UI)
     for (const r of results) {
-      const dayVals = weekdays.map((d) => r.dayBreakdown[d]?.type || "absent");
-      const compliant = r.total >= CONFIG.MIN_OFFICE_DAYS;
-      let emailStatus = "Pending",
-        sentAt = "";
+      const dayVals = weekdays.map(d => r.dayBreakdown[d]?.type || "absent");
+      if (r.flagged || r.compliant) continue; // skip — only email non-compliant
 
-      if (!compliant) {
-        if (!r.email || !r.email.includes("@")) {
-          emailStatus = "No email on record";
-          noEmail.push(r.name);
-        } else {
-          try {
-            GmailApp.sendEmail(
-              r.email,
-              `Office Attendance Reminder — Week of ${weekLabel}`,
-              buildEmailBody(r, weekLabel, weekdays, dayNames, emailTemplate),
-            );
-            emailStatus = "Sent";
-            sentAt = now.toLocaleString();
-            sent.push(r.name);
-          } catch (e) {
-            emailStatus = "Failed: " + e.message;
-            failed.push(r.name);
-          }
-          Utilities.sleep(150);
-        }
+      let emailStatus = "Pending", sentAt = "";
+      if (!r.email || !r.email.includes("@")) {
+        emailStatus = "No email on record";
+        noEmail.push(r.name);
       } else {
-        emailStatus = "Compliant — no email";
+        try {
+          const overrides = emailOverrides || {};
+          const body = overrides[r.id] !== undefined
+            ? overrides[r.id]
+            : buildEmailBody(r, weekLabel, weekdays, dayNames, emailTemplate);
+          GmailApp.sendEmail(
+            r.email,
+            `Office Attendance Reminder — Week of ${weekLabel}`,
+            body,
+          );
+          emailStatus = "Sent";
+          sentAt = now.toLocaleString();
+          sent.push(r.name);
+        } catch (e) {
+          emailStatus = "Failed: " + e.message;
+          failed.push(r.name);
+        }
+        Utilities.sleep(150);
       }
 
-      resultRows.push([
+      logRows.push([
+        now.toLocaleString(),
+        weekLabel,
         r.id,
         r.name,
         r.email,
-        weekLabel,
-        ...dayVals,
         r.total,
-        compliant ? "Yes" : "No",
+        ...dayVals,
         emailStatus,
         sentAt,
       ]);
-      if (!compliant)
-        logRows.push([
-          now.toLocaleString(),
-          weekLabel,
-          r.id,
-          r.name,
-          r.email,
-          r.total,
-          ...dayVals,
-          emailStatus,
-        ]);
     }
 
-    rs.clearContents();
-    const rHeaders = [
-      "Employee ID",
-      "Employee Name",
-      "Email",
-      "Week",
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Total Days",
-      "Compliant",
-      "Email Status",
-      "Sent At",
-    ];
-    rs.getRange(1, 1, 1, rHeaders.length)
-      .setValues([rHeaders])
-      .setBackground("#1e2026")
-      .setFontColor("#e6a817")
-      .setFontWeight("bold");
-    if (resultRows.length > 0)
-      rs.getRange(2, 1, resultRows.length, resultRows[0].length).setValues(
-        resultRows,
-      );
-
-    for (let i = 0; i < resultRows.length; i++) {
-      rs.getRange(i + 2, 11).setFontColor(
-        resultRows[i][10] === "Yes" ? "#3fb950" : "#f85149",
-      );
-    }
+    // Append to Email Log only
     if (logRows.length > 0) {
       const lastRow = ls.getLastRow();
-      ls.getRange(lastRow + 1, 1, logRows.length, logRows[0].length).setValues(
-        logRows,
-      );
+      // Ensure header if sheet is empty
+      if (lastRow === 0) {
+        const lHeaders = ["Timestamp","Week","Employee ID","Employee Name","Email","Total Days","Mon","Tue","Wed","Thu","Fri","Email Status","Sent At"];
+        ls.getRange(1, 1, 1, lHeaders.length)
+          .setValues([lHeaders])
+          .setBackground("#1e2026")
+          .setFontColor("#e6a817")
+          .setFontWeight("bold");
+      }
+      ls.getRange(ls.getLastRow() + 1, 1, logRows.length, logRows[0].length).setValues(logRows);
     }
 
     return {
@@ -635,7 +679,8 @@ function parseZohoData(sheets) {
 function parseUllenAyyahData(sheets) {
   const officeMap = {},
     employees = [];
-  const OFFICE_UA = new Set(["WFC", "WFB", "WFCO"]);
+  const OFFICE_UA_BIOMETRIC = new Set(["WFC", "WFB"]); // biometric expected for these
+  const OFFICE_UA_CLIENT   = new Set(["WFCO"]);         // client office — no biometric needed
   const ws = sheets[Object.keys(sheets)[0]];
   if (!ws || ws.length < 2) return { officeMap, employees };
   const hdr = ws[0];
@@ -673,7 +718,8 @@ function parseUllenAyyahData(sheets) {
         .toUpperCase();
       if (s === "-" || s === "") continue;
       let entry;
-      if (OFFICE_UA.has(s)) entry = { type: "office" };
+      if (OFFICE_UA_BIOMETRIC.has(s))   entry = { type: "office" };      // WFC/WFB — biometric cross-check applies
+      else if (OFFICE_UA_CLIENT.has(s)) entry = { type: "office_co" };   // WFCO — client office, no biometric needed
       else if (s === "L") entry = { type: "leave", value: 1 };
       else if (s === "WR") entry = { type: "remote" };
       else continue;
@@ -729,45 +775,54 @@ function computeCompliance(
       const ex = (excuse[id] || {})[date];
       let score = 0,
         type = "absent";
-      if (cE && cE.type === "office") {
-        score = 1;
-        type = "office";
-      } else if (bE && bE.type === "office") {
-        score = 1;
-        type = "office";
+      const hasBiometricOffice = (cE && cE.type === "office") || (bE && bE.type === "office");
+      const hasWfcWfb  = uE && uE.type === "office";    // WFC or WFB — biometric cross-check applies
+      const hasWfco    = uE && uE.type === "office_co"; // WFCO — client office, no biometric needed
+
+      if (hasWfco) {
+        // WFCO: always counts as office, never flagged
+        score = 1; type = "office";
+      } else if (hasBiometricOffice && hasWfcWfb) {
+        // Both biometric AND Ullen Ayyah (WFC/WFB) agree → clean office day
+        score = 1; type = "office";
+      } else if (hasBiometricOffice && !uE) {
+        // Biometric says office but person never marked in Ullen Ayyah → bio defaulter
+        score = 1; type = "flagged_bio";
+      } else if (hasWfcWfb && !hasBiometricOffice) {
+        // WFC/WFB in Ullen Ayyah but no biometric record → UA defaulter
+        score = 1; type = "flagged_ua";
+      } else if (hasBiometricOffice) {
+        // Biometric office + Ullen Ayyah has something (leave/remote) — biometric wins
+        score = 1; type = "office";
       } else if (cE && cE.type === "leave") {
-        score = cE.value ?? 1;
-        type = "leave";
+        score = cE.value ?? 1; type = "leave";
       } else if (cE && cE.type === "half_leave") {
-        score = cE.value ?? 0.5;
-        type = "half_leave";
+        score = cE.value ?? 0.5; type = "half_leave";
       } else if (bE && bE.type === "leave") {
-        score = 1;
-        type = "leave";
+        score = 1; type = "leave";
       } else if (zE && zE.type === "leave") {
-        score = 1;
-        type = "leave";
+        score = 1; type = "leave";
       } else if (zE && zE.type === "half_leave") {
-        score = zE.value ?? 0.5;
-        type = "half_leave";
-      } else if (uE && uE.type === "office") {
-        score = 1;
-        type = "office";
+        score = zE.value ?? 0.5; type = "half_leave";
       } else if (uE && uE.type === "leave") {
-        score = 1;
-        type = "leave";
+        score = 1; type = "leave";
       } else if (ex) {
-        score = 1;
-        type = "excuse";
+        score = 1; type = "excuse";
       }
       total += score;
       dayBreakdown[date] = { score, type };
     }
     const roundedTotal = Math.ceil(total);
+    const hasUaFlag  = Object.values(dayBreakdown).some(d => d.type === "flagged_ua");
+    const hasBioFlag = Object.values(dayBreakdown).some(d => d.type === "flagged_bio");
+    const hasFlagged = hasUaFlag || hasBioFlag;
     return {
       ...emp,
       total: roundedTotal,
-      compliant: roundedTotal >= CONFIG.MIN_OFFICE_DAYS,
+      flagged: hasFlagged,
+      flagged_ua:  hasUaFlag,
+      flagged_bio: hasBioFlag,
+      compliant: !hasFlagged && roundedTotal >= CONFIG.MIN_OFFICE_DAYS,
       dayBreakdown,
     };
   });
