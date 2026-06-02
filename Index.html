@@ -18,6 +18,18 @@
   --t1:#e6edf3;--t2:#8b949e;--mu:#484f58;
   --mo:'JetBrains Mono',monospace;--sa:'Space Grotesk',sans-serif;--r:8px;
 }
+[data-theme="light"]{
+  --bg:#f6f8fa;--s1:#ffffff;--s2:#f0f2f5;
+  --bd:#d0d7de;--bd2:#b9c0c8;
+  --ac:#c47d00;--acd:rgba(196,125,0,.1);
+  --gn:#1a7f37;--gnd:rgba(26,127,55,.1);
+  --rd:#cf222e;--rdd:rgba(207,34,46,.08);
+  --pu:#7c3aed;--pud:rgba(124,58,237,.1);
+  --bl:#0969da;
+  --t1:#1f2328;--t2:#656d76;--mu:#9ca3af;
+}
+.theme-toggle{background:var(--s2);border:1px solid var(--bd);color:var(--t2);border-radius:20px;padding:5px 12px;font-family:var(--mo);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap}
+.theme-toggle:hover{border-color:var(--ac);color:var(--t1)}
 body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh;font-size:14px}
 .topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:20}
 .brand-left{display:flex;align-items:center;gap:10px;flex-shrink:0}.brand-logo{height:28px;width:auto;flex-shrink:0}.brand-name{font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
@@ -87,6 +99,14 @@ td.nm{font-weight:600;font-size:13px;white-space:nowrap}
 td.mo{font-family:var(--mo);font-size:11px;color:var(--t2)}
 td.rb{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--rd)}
 td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
+thead th.sortable{cursor:pointer;user-select:none}
+thead th.sortable:hover{color:var(--t1)}
+thead th .sort-icon{display:inline-block;margin-left:4px;opacity:.4;font-size:9px}
+thead th.sort-asc .sort-icon{opacity:1;color:var(--ac)}
+thead th.sort-desc .sort-icon{opacity:1;color:var(--ac)}
+thead tr.filter-row th{padding:4px 6px;background:var(--s1)}
+thead tr.filter-row input{width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--bd);border-radius:4px;color:var(--t1);font-family:var(--mo);font-size:11px;padding:3px 7px;outline:none}
+thead tr.filter-row input:focus{border-color:var(--ac)}
 .dp{font-size:9px;font-family:var(--mo);padding:2px 6px;border-radius:20px;white-space:nowrap;display:inline-block}
 .po{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
 .pl{background:var(--acd);color:var(--ac);border:1px solid rgba(230,168,23,.25)}
@@ -142,6 +162,7 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
     <span class="brand-name">Acies Global · weekly review</span>
   </div>
   <div class="title" style="margin-left:auto">Attendance Compliance</div>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
 </div>
 
 <div class="stepper" id="stepper">
@@ -233,7 +254,13 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   <!-- SCREEN 2: PREVIEW -->
   <div id="screen-preview" style="display:none">
     <div class="stats" id="stats-row"></div>
+    <div style="margin:10px 0 4px 0">
+      <input id="global-search" type="text" placeholder="Search by name or email…"
+        oninput="applySearch()"
+        style="width:100%;box-sizing:border-box;padding:8px 14px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);color:var(--t1);font-family:var(--mo);font-size:13px;outline:none;">
+    </div>
     <div id="card-hint" style="font-size:12px;color:var(--mu);font-family:var(--mo);text-align:center;padding:32px 0;">↑ Click a card above to view the list</div>
+    <div class="twrap" id="table-all" style="display:none"></div>
     <div class="twrap" id="table-ua"  style="display:none"></div>
     <div class="twrap" id="table-bio" style="display:none"></div>
     <div class="twrap" id="table-nc"  style="display:none"></div>
@@ -351,6 +378,12 @@ let results = [], weekdays = [], weekLabel = "", selected = new Set();
 let emailOverrides = {};   // empId → custom body string
 let previewEmpId = null;   // which employee is currently open in preview modal
 let currentFilter = null;  // which card is active ('all','nc','c','sel','fl')
+
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = isLight ? '☀ Light' : '☾ Dark';
+}
 
 const DEFAULT_TEMPLATE = `Dear {{name}},
 
@@ -504,8 +537,8 @@ function renderPreview() {
     <div class="scard" id="card-nc"  onclick="filterView('nc')"><div class="sval rd">${nc.length}</div><div class="slbl">non-compliant</div></div>
     <div class="scard" id="card-c"   onclick="filterView('c')"><div class="sval gn">${cp.length}</div><div class="slbl">compliant</div></div>
     <div class="scard" id="card-sel" onclick="filterView('sel')"><div class="sval pu" id="sel-count">${nc.length}</div><div class="slbl">selected to email</div></div>
-    <div class="scard" id="card-ua"  onclick="filterView('ua')"><div class="sval or">${ua.length}</div><div class="slbl">UA defaulters</div></div>
-    <div class="scard" id="card-bio" onclick="filterView('bio')"><div class="sval pu">${bio.length}</div><div class="slbl">bio defaulters</div></div>
+    <div class="scard" id="card-ua"  onclick="filterView('ua')"><div class="sval pu">${ua.length}</div><div class="slbl">bio defaulters</div></div>
+    <div class="scard" id="card-bio" onclick="filterView('bio')"><div class="sval or">${bio.length}</div><div class="slbl">UA defaulters</div></div>
   `;
 
   const dayThs = weekdays.map((d,i) => {
@@ -515,8 +548,9 @@ function renderPreview() {
 
   const ncRows = nc.length === 0
     ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">🎉 All employees compliant this week</td></tr>`
-    : nc.map(r => `
-      <tr class="nc" id="row-${r.id}">
+    : nc.map((r,i) => `
+      <tr class="nc" id="row-${r.id}" data-name="${r.name.toLowerCase()}" data-email="${(r.email||"").toLowerCase()}">
+        <td style="font-family:var(--mo);font-size:12px;color:var(--mu);text-align:center">${i+1}</td>
         <td><input type="checkbox" id="chk-${r.id}" checked onchange="toggleSelect('${r.id}')" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer"></td>
         <td class="nm">${r.name}</td>
         <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
@@ -533,11 +567,12 @@ function renderPreview() {
       <span class="badge brd">${nc.length}</span>
       <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">check/uncheck to include or exclude</span>
     </div>
-    <table><thead><tr><th>${allChecked}</th><th>Employee</th><th>Email</th><th>Score</th>${dayThs}<th>Preview</th></tr></thead>
+    <table><thead><tr><th>#</th><th>${allChecked}</th><th>Employee</th><th>Email</th><th>Score</th>${dayThs}<th>Preview</th></tr></thead>
     <tbody>${ncRows}</tbody></table>`;
 
-  const cpRows = cp.map(r => `
-    <tr>
+  const cpRows = cp.map((r,i) => `
+    <tr data-name="${r.name.toLowerCase()}" data-email="${(r.email||"").toLowerCase()}">
+      <td style="font-family:var(--mo);font-size:12px;color:var(--mu);text-align:center">${i+1}</td>
       <td class="nm">${r.name}</td>
       <td class="rg">${r.total} / 5</td>
       ${weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")}
@@ -549,11 +584,12 @@ function renderPreview() {
       <span class="badge bgn">${cp.length}</span>
       <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">no emails will be sent</span>
     </div>
-    <table><thead><tr><th>Employee</th><th>Score</th>${dayThs}</tr></thead>
+    <table><thead><tr><th>#</th><th>Employee</th><th>Score</th>${dayThs}</tr></thead>
     <tbody>${cpRows}</tbody></table>`;
 
-  const flaggedRow = (r, scoreColor) => `
-      <tr>
+  const flaggedRow = (r, scoreColor, i) => `
+      <tr data-name="${r.name.toLowerCase()}" data-email="${(r.email||"").toLowerCase()}">
+        <td style="font-family:var(--mo);font-size:12px;color:var(--mu);text-align:center">${i+1}</td>
         <td class="nm">${r.name}</td>
         <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
         <td style="font-family:var(--mo);font-size:13px;font-weight:700;color:${scoreColor}">${r.total} / 5</td>
@@ -561,36 +597,227 @@ function renderPreview() {
       </tr>`;
 
   const uaRows = ua.length === 0
-    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">No UA defaulters this week</td></tr>`
-    : ua.map(r => flaggedRow(r, "#f0883e")).join("");
+    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">No bio defaulters this week</td></tr>`
+    : ua.map((r,i) => flaggedRow(r, "var(--pu)", i)).join("");
 
   const bioRows = bio.length === 0
-    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">No biometric defaulters this week</td></tr>`
-    : bio.map(r => flaggedRow(r, "var(--pu)")).join("");
+    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">No UA defaulters this week</td></tr>`
+    : bio.map((r,i) => flaggedRow(r, "#f0883e", i)).join("");
 
   document.getElementById("table-ua").innerHTML = `
     <div class="tbar">
-      <span class="tbar-title">UA Defaulters</span>
-      <span class="badge" style="background:rgba(240,136,62,.1);color:#f0883e;border:1px solid rgba(240,136,62,.3)">${ua.length}</span>
+      <span class="tbar-title">Bio Defaulters</span>
+      <span class="badge" style="background:var(--pud);color:var(--pu);border:1px solid rgba(188,140,255,.3)">${ua.length}</span>
       <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">WFC/WFB in Ullen Ayyah but no biometric record</span>
     </div>
-    <table><thead><tr><th>Employee</th><th>Email</th><th>Score</th>${dayThs}</tr></thead>
+    <table><thead><tr><th>#</th><th>Employee</th><th>Email</th><th>Score</th>${dayThs}</tr></thead>
     <tbody>${uaRows}</tbody></table>`;
 
   document.getElementById("table-bio").innerHTML = `
     <div class="tbar">
-      <span class="tbar-title">Bio Defaulters</span>
-      <span class="badge" style="background:var(--pud);color:var(--pu);border:1px solid rgba(188,140,255,.3)">${bio.length}</span>
+      <span class="tbar-title">UA Defaulters</span>
+      <span class="badge" style="background:rgba(240,136,62,.1);color:#f0883e;border:1px solid rgba(240,136,62,.3)">${bio.length}</span>
       <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">Biometric office recorded but not marked in Ullen Ayyah</span>
     </div>
-    <table><thead><tr><th>Employee</th><th>Email</th><th>Score</th>${dayThs}</tr></thead>
+    <table><thead><tr><th>#</th><th>Employee</th><th>Email</th><th>Score</th>${dayThs}</tr></thead>
     <tbody>${bioRows}</tbody></table>`;
 
+  // Build unified "all employees" table
+  const allRows = results.map((r, i) => {
+    const tick = `<span style="color:#3fb950;font-size:15px">✓</span>`;
+    const dash = `<span style="color:var(--mu);font-size:13px">—</span>`;
+    return `<tr data-name="${r.name.toLowerCase()}" data-email="${(r.email||"").toLowerCase()}">
+      <td style="font-family:var(--mo);font-size:12px;color:var(--mu);text-align:center">${i+1}</td>
+      <td class="nm">${r.name}</td>
+      <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
+      <td style="font-family:var(--mo);font-size:13px;font-weight:700">${r.total} / 5</td>
+      <td style="text-align:center">${(!r.flagged && !r.compliant) ? tick : dash}</td>
+      <td style="text-align:center">${(!r.flagged && r.compliant)  ? tick : dash}</td>
+      <td style="text-align:center">${r.flagged_ua  ? tick : dash}</td>
+      <td style="text-align:center">${r.flagged_bio ? tick : dash}</td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("table-all").innerHTML = `
+    <div class="tbar">
+      <span class="tbar-title">All Employees</span>
+      <span class="badge" style="background:var(--acd);color:var(--ac);border:1px solid var(--ac)">${results.length}</span>
+    </div>
+    <table><thead><tr>
+      <th style="text-align:center">#</th><th>Employee</th><th>Email</th><th>Score</th>
+      <th style="text-align:center;color:var(--rd)">Non-Compliant</th>
+      <th style="text-align:center;color:#3fb950">Compliant</th>
+      <th style="text-align:center;color:var(--pu)">Bio Defaulter</th>
+      <th style="text-align:center;color:#f0883e">UA Defaulter</th>
+    </tr></thead>
+    <tbody>${allRows}</tbody></table>`;
+
   updateSendBtn();
-  // Tables hidden — user must click a card to reveal
+  setupAllTables();
+  filterView('all'); // default view on load
+}
+
+// ── EXCEL-STYLE COLUMN FILTER ─────────────────────────────────
+const colFilterState = {}; // tableId -> colIdx -> Set|null
+
+function makeSortable(tableEl) {
+  const wrap = tableEl.closest('.twrap');
+  const id = wrap ? wrap.id : ('t' + Date.now());
+  tableEl._fid = id;
+  if (!colFilterState[id]) colFilterState[id] = {};
+  const thead = tableEl.querySelector('thead');
+  if (!thead || thead.querySelector('.cf-setup')) return;
+  thead.querySelector('tr').classList.add('cf-setup');
+  const ths = Array.from(thead.querySelector('tr').querySelectorAll('th'));
+  ths.forEach((th, col) => {
+    const label = th.textContent.trim();
+    th.innerHTML = '';
+    th.style.whiteSpace = 'nowrap';
+    const w = document.createElement('span');
+    w.style.cssText = 'display:inline-flex;align-items:center;gap:5px;width:100%';
+    const lbl = document.createElement('span');
+    lbl.textContent = label;
+    lbl.style.cssText = 'cursor:pointer;flex:1;min-width:0';
+    lbl.addEventListener('click', () => sortByCol(tableEl, col, th, ths));
+    const fBtn = document.createElement('span');
+    fBtn.className = 'cf-btn';
+    fBtn.innerHTML = `<svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/></svg>`;
+    fBtn.style.cssText = 'cursor:pointer;opacity:1;padding:2px 4px;border-radius:3px;flex-shrink:0;transition:background .15s;line-height:1;color:var(--t1);background:var(--bd2)';
+    fBtn.addEventListener('mouseenter', () => { fBtn.style.background='var(--ac)'; fBtn.style.color='#000'; });
+    fBtn.addEventListener('mouseleave', () => { fBtn.style.background = colFilterState[id][col] ? 'var(--ac)' : 'var(--bd2)'; fBtn.style.color = colFilterState[id][col] ? '#000' : 'var(--t1)'; });
+    fBtn.addEventListener('click', e => { e.stopPropagation(); openColDrop(tableEl, col, fBtn); });
+    w.appendChild(lbl); w.appendChild(fBtn);
+    th.appendChild(w);
+  });
+}
+
+function sortByCol(tableEl, col, th, ths) {
+  const asc = th.dataset.s !== 'asc';
+  ths.forEach(t => { delete t.dataset.s; const s = t.querySelector('.sort-icon'); if(s) s.remove(); });
+  th.dataset.s = asc ? 'asc' : 'desc';
+  const icon = document.createElement('span');
+  icon.className = 'sort-icon';
+  icon.textContent = asc ? ' ▲' : ' ▼';
+  icon.style.cssText = 'font-size:9px;color:var(--ac)';
+  th.querySelector('span').appendChild(icon);
+  const tbody = tableEl.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a,b) => {
+    const aT=(a.cells[col]?.textContent||'').trim(), bT=(b.cells[col]?.textContent||'').trim();
+    const n=parseFloat(aT)-parseFloat(bT);
+    if(!isNaN(n)) return asc?n:-n;
+    return asc?aT.localeCompare(bT):bT.localeCompare(aT);
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+}
+
+function openColDrop(tableEl, col, btn) {
+  closeColDrop();
+  const id = tableEl._fid;
+  const allRows = Array.from(tableEl.querySelectorAll('tbody tr'));
+  const vals = [...new Set(allRows.map(r=>(r.cells[col]?.textContent||'').trim()).filter(Boolean))].sort();
+  const curSelected = colFilterState[id][col] || new Set(vals);
+
+  const drop = document.createElement('div');
+  drop.id = 'cf-drop';
+  drop.style.cssText = 'position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r);box-shadow:0 8px 28px rgba(0,0,0,.6);width:220px;font-family:var(--mo);font-size:12px;color:var(--t1)';
+  const rect = btn.getBoundingClientRect();
+  drop.style.top  = Math.min(rect.bottom+4, window.innerHeight-320)+'px';
+  drop.style.left = Math.max(4, Math.min(rect.left, window.innerWidth-228))+'px';
+
+  // search
+  drop.innerHTML = `<div style="padding:8px;border-bottom:1px solid var(--bd)">
+    <input id="cf-search" type="text" placeholder="Search…" style="width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--bd);border-radius:4px;color:var(--t1);padding:5px 8px;font-family:var(--mo);font-size:12px;outline:none">
+  </div>
+  <div style="padding:5px 10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
+    <input type="checkbox" id="cf-all" style="width:13px;height:13px;accent-color:var(--ac);cursor:pointer">
+    <label for="cf-all" style="cursor:pointer;color:var(--t2);font-weight:600">(Select All)</label>
+  </div>
+  <div id="cf-list" style="max-height:210px;overflow-y:auto;padding:4px 0"></div>
+  <div style="padding:7px 10px;border-top:1px solid var(--bd);display:flex;gap:7px;justify-content:flex-end">
+    <button id="cf-clear" style="background:transparent;border:1px solid var(--bd);color:var(--t2);border-radius:4px;padding:4px 11px;font-family:var(--mo);font-size:11px;cursor:pointer">Clear</button>
+    <button id="cf-ok" style="background:var(--ac);border:none;color:#000;border-radius:4px;padding:4px 11px;font-family:var(--mo);font-size:11px;cursor:pointer;font-weight:700">OK</button>
+  </div>`;
+
+  document.body.appendChild(drop);
+
+  const list = drop.querySelector('#cf-list');
+  const allChk = drop.querySelector('#cf-all');
+  const items = [];
+  vals.forEach(val => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 10px;cursor:pointer';
+    row.style.cssText += ';transition:background .1s';
+    row.onmouseenter = () => row.style.background='var(--s2)';
+    row.onmouseleave = () => row.style.background='';
+    const chk = document.createElement('input');
+    chk.type = 'checkbox'; chk.checked = curSelected.has(val);
+    chk.style.cssText = 'width:13px;height:13px;accent-color:var(--ac);cursor:pointer;flex-shrink:0';
+    const lbl = document.createElement('span');
+    lbl.textContent = val;
+    lbl.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1';
+    row.appendChild(chk); row.appendChild(lbl);
+    row.addEventListener('click', e => { if(e.target!==chk) chk.checked=!chk.checked; syncAll(); });
+    list.appendChild(row);
+    items.push({chk, val, row});
+  });
+
+  const syncAll = () => {
+    const n = items.filter(i=>i.chk.checked).length;
+    allChk.checked = n===items.length;
+    allChk.indeterminate = n>0 && n<items.length;
+  };
+  syncAll();
+  allChk.addEventListener('change', () => items.forEach(i => { if(i.row.style.display!=='none') i.chk.checked=allChk.checked; }));
+  drop.querySelector('#cf-search').addEventListener('input', e => {
+    const q=e.target.value.toLowerCase();
+    items.forEach(i=>{ i.row.style.display=(!q||i.val.toLowerCase().includes(q))?'':'none'; });
+  });
+  drop.querySelector('#cf-clear').addEventListener('click', () => { items.forEach(i=>i.chk.checked=true); syncAll(); });
+  drop.querySelector('#cf-ok').addEventListener('click', () => {
+    const chosen = new Set(items.filter(i=>i.chk.checked).map(i=>i.val));
+    colFilterState[id][col] = chosen.size===vals.length ? null : chosen;
+    btn.style.opacity = colFilterState[id][col] ? '1' : '.35';
+    btn.style.color   = colFilterState[id][col] ? 'var(--ac)' : '';
+    applyColFilterState(tableEl);
+    closeColDrop();
+  });
+
+  drop.addEventListener('click', e=>e.stopPropagation());
+  setTimeout(()=>document.addEventListener('click', closeColDrop, {once:true}), 0);
+}
+
+function closeColDrop() { const d=document.getElementById('cf-drop'); if(d) d.remove(); }
+
+function applyColFilterState(tableEl) {
+  const id = tableEl._fid;
+  const filters = colFilterState[id] || {};
+  const globalQ = (document.getElementById('global-search')?.value||'').toLowerCase().trim();
+  tableEl.querySelectorAll('tbody tr').forEach(row => {
+    const colOk = Object.entries(filters).every(([c,allowed])=>!allowed||(allowed.has((row.cells[+c]?.textContent||'').trim())));
+    const name  = row.getAttribute('data-name')||'';
+    const email = row.getAttribute('data-email')||'';
+    const globalOk = !globalQ||name.includes(globalQ)||email.includes(globalQ);
+    row.style.display = colOk&&globalOk ? '' : 'none';
+  });
+}
+
+function setupAllTables() {
+  ['table-all','table-ua','table-bio','table-nc','table-c'].forEach(id => {
+    const wrap = document.getElementById(id);
+    if (wrap) { const tbl = wrap.querySelector('table'); if (tbl) makeSortable(tbl); }
+  });
+}
+
+function applySearch() {
+  ["table-all","table-ua","table-bio","table-nc","table-c"]
+    .map(id => document.getElementById(id))
+    .filter(w => w && w.style.display !== "none")
+    .forEach(wrap => { const tbl = wrap.querySelector("table"); if (tbl) applyColFilterState(tbl); });
 }
 
 function filterView(type) {
+  const allWrap = document.getElementById("table-all");
   const uaWrap  = document.getElementById("table-ua");
   const bioWrap = document.getElementById("table-bio");
   const ncWrap  = document.getElementById("table-nc");
@@ -598,6 +825,8 @@ function filterView(type) {
   const hint    = document.getElementById("card-hint");
 
   if (hint) hint.style.display = "none";
+  const searchBox = document.getElementById("global-search");
+  if (searchBox) searchBox.value = "";
   currentFilter = type;
   const expBtn = document.getElementById("btn-export");
   if (expBtn) expBtn.disabled = false;
@@ -607,14 +836,10 @@ function filterView(type) {
   });
 
   // Hide all, then show what's needed
-  [uaWrap, bioWrap, ncWrap, cWrap].forEach(w => { if(w) w.style.display = "none"; });
+  [allWrap, uaWrap, bioWrap, ncWrap, cWrap].forEach(w => { if(w) w.style.display = "none"; });
 
   if (type === 'all') {
-    [uaWrap, bioWrap, ncWrap, cWrap].forEach(w => { if(w) w.style.display = ""; });
-    results.filter(r => !r.compliant && !r.flagged).forEach(r => {
-      const row = document.getElementById("row-" + r.id);
-      if (row) row.style.display = "";
-    });
+    if (allWrap) allWrap.style.display = "";
   } else if (type === 'ua') {
     uaWrap.style.display = "";
   } else if (type === 'bio') {
@@ -638,7 +863,7 @@ function filterView(type) {
 
 // ── EXPORT ───────────────────────────────────────────────────
 function getExportRows() {
-  const LABELS = { all:'All Employees', nc:'Non-Compliant', c:'Compliant', sel:'Selected to Email', ua:'UA Defaulters', bio:'Bio Defaulters' };
+  const LABELS = { all:'All Employees', nc:'Non-Compliant', c:'Compliant', sel:'Selected to Email', ua:'Bio Defaulters', bio:'UA Defaulters' };
   let rows;
   if (currentFilter === 'ua')       rows = results.filter(r => r.flagged_ua);
   else if (currentFilter === 'bio') rows = results.filter(r => r.flagged_bio);

@@ -105,10 +105,9 @@ function processFiles(payload) {
       ? parseExcuseData(decodeFile(excuseB64, ft.excuse || "xlsx"))
       : {};
 
-    // Merge employees from all sources — Ullen Ayyah first (has email),
-    // then Zoho, then Chennai/Bangalore biometric.
-    const seenIds = new Set();
-    const employees = [];
+    // Zoho is the employee master — only Zoho employees are included.
+    // Biometric (Chennai/Bangalore) and Ullen Ayyah data are used for attendance
+    // computation only; anyone not in Zoho is excluded from the results.
     const SYSTEM_NAMES = new Set(["acies global", "acies auditor", "acies", "auditor auditor"]);
     const SYSTEM_EMAILS = new Set(["license@aciesglobal.com", "auditor@aciesglobal.com"]);
     const isSystemRow = e => {
@@ -116,10 +115,9 @@ function processFiles(payload) {
       const email = (e.email || "").trim().toLowerCase();
       return SYSTEM_EMAILS.has(email) || SYSTEM_NAMES.has(name);
     };
-    for (const e of ullenEmps) {
-      if (!seenIds.has(e.id) && !isSystemRow(e)) { seenIds.add(e.id); employees.push(e); }
-    }
-    for (const e of [...zohoEmps, ...chennaiEmps, ...bangaloreEmps]) {
+    const seenIds = new Set();
+    const employees = [];
+    for (const e of zohoEmps) {
       if (!seenIds.has(e.id) && e.name && !isSystemRow(e)) {
         seenIds.add(e.id);
         employees.push({ ...e, email: e.email || emailMap[e.id] || "" });
