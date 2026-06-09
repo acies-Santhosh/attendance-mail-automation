@@ -232,7 +232,7 @@ thead th{position:relative}
         <input type="file" id="f-chennai" accept=".xlsx,.xls,.xlsm,.csv" onchange="fileChosen('chennai',this)">
         <div class="uz-tag">Master · Biometric</div>
         <div class="uz-label">Chennai Attendance</div>
-        <div class="uz-desc">Daily sheets: 18 May, 19 May … · Employee ID + Clock In</div>
+        <div class="uz-desc">Multi-sheet (one tab per day) or single-sheet format · Employee ID + Clock In</div>
         <div class="uz-status" id="st-chennai">Click or drag to upload</div>
       </label>
       <label class="uz" id="uz-bangalore" ondragover="drag(event,'bangalore')" ondragleave="undrag('bangalore')" ondrop="drop(event,'bangalore')">
@@ -268,9 +268,9 @@ thead th{position:relative}
 
     <div class="week-row">
       <span class="wl">WEEK START (Mon)</span>
-      <input type="date" id="wstart" value="2026-05-18" onchange="updateWeekDisplay()">
+      <input type="date" id="wstart" onchange="updateWeekDisplay()">
       <span class="wl">WEEK END (Fri)</span>
-      <input type="date" id="wend" value="2026-05-22" onchange="updateWeekDisplay()">
+      <input type="date" id="wend" onchange="updateWeekDisplay()">
       <div class="wdisp" id="wdisp"></div>
     </div>
 
@@ -377,6 +377,19 @@ let columnFilters = {};
 let cfCol = null, cfPending = new Set(), cfAllVals = [], cfColCounts = {};
 
 // ── WEEK DISPLAY ───────────────────────────────────────────────────────────
+// Auto-set to the most recent Mon–Fri on load
+(function initWeekDates() {
+  const today = new Date();
+  const day   = today.getDay();                   // 0=Sun … 6=Sat
+  const toMon = day === 0 ? -6 : 1 - day;        // days back to Monday
+  const mon   = new Date(today); mon.setDate(today.getDate() + toMon);
+  const fri   = new Date(mon);   fri.setDate(mon.getDate() + 4);
+  const iso   = d => d.toISOString().slice(0, 10);
+  document.getElementById("wstart").value = iso(mon);
+  document.getElementById("wend").value   = iso(fri);
+  updateWeekDisplay();
+})();
+
 function updateWeekDisplay() {
   const s = document.getElementById("wstart").value;
   const e = document.getElementById("wend").value;
@@ -528,7 +541,8 @@ function renderPreview() {
   document.getElementById("excluded-banner").innerHTML = excBadge;
 
   // ── STATS (clickable cards) ─────────────────────────────────
-  const excl = results.filter(r => isExcluded(r));
+  const excl    = results.filter(r => isExcluded(r));
+  const reacted = results.filter(r => !isExcluded(r) && weekdays.some(d => r.dayBreakdown?.[d]?.type === "claimed"));
   document.getElementById("stats-row").innerHTML = `
     <div class="scard" id="card-all" onclick="setFilter(null)" title="Show all employees">
       <div class="sval ac">${results.length}</div><div class="slbl">total employees</div>
@@ -538,6 +552,9 @@ function renderPreview() {
     </div>
     <div class="scard" id="card-notmet" onclick="setFilter('notmet')" title="Click to filter">
       <div class="sval rd">${nc.length}</div><div class="slbl">not met criteria</div>
+    </div>
+    <div class="scard" id="card-reacted" onclick="setFilter('reacted')" title="Reacted in Ullen Ayyah (WFC/WFB) but no biometric found">
+      <div class="sval" style="color:var(--or)">${reacted.length}</div><div class="slbl">reacted, no bio</div>
     </div>
     <div class="scard" id="card-excl" onclick="setFilter('excluded')" title="View excluded employees">
       <div class="sval" style="color:var(--mu)">${excl.length}</div><div class="slbl">excluded</div>
@@ -695,9 +712,10 @@ function setFilter(f) {
   activeFilter = (activeFilter === f) ? null : f; // toggle off if same card clicked again
   searchTerm = ""; // reset search when switching filter
   // Update card highlight
-  ["card-all","card-met","card-notmet","card-excl"].forEach(id => document.getElementById(id)?.classList.remove("active-filter"));
+  ["card-all","card-met","card-notmet","card-reacted","card-excl"].forEach(id => document.getElementById(id)?.classList.remove("active-filter"));
   if (activeFilter === "met")      document.getElementById("card-met")?.classList.add("active-filter");
   if (activeFilter === "notmet")   document.getElementById("card-notmet")?.classList.add("active-filter");
+  if (activeFilter === "reacted")  document.getElementById("card-reacted")?.classList.add("active-filter");
   if (activeFilter === "excluded") document.getElementById("card-excl")?.classList.add("active-filter");
   if (activeFilter === null)       document.getElementById("card-all")?.classList.add("active-filter");
   renderTable();
@@ -707,6 +725,7 @@ function renderTable() {
   let visible = results;
   if (activeFilter === "met")      visible = results.filter(r =>  r.compliant && !isExcluded(r));
   if (activeFilter === "notmet")   visible = results.filter(r => !r.compliant && !isExcluded(r));
+  if (activeFilter === "reacted")  visible = results.filter(r => !isExcluded(r) && weekdays.some(d => r.dayBreakdown?.[d]?.type === "claimed"));
   if (activeFilter === "excluded") visible = results.filter(r =>  isExcluded(r));
   if (activeFilter === null)       visible = results.filter(r => !isExcluded(r));
 
@@ -731,15 +750,17 @@ function renderTable() {
   }
   visibleRows = visible; // keep for export
 
-  const showDays   = activeFilter === "met" || activeFilter === "notmet" || activeFilter === "excluded";
+  const showDays   = activeFilter === "met" || activeFilter === "notmet" || activeFilter === "reacted" || activeFilter === "excluded";
   const isNotMet   = activeFilter === "notmet";
   // Tab totals (used for badge + "Showing X of Y")
   const tabTotal = activeFilter === "met"      ? results.filter(r =>  r.compliant && !isExcluded(r)).length
                  : activeFilter === "notmet"   ? results.filter(r => !r.compliant && !isExcluded(r)).length
+                 : activeFilter === "reacted"  ? results.filter(r => !isExcluded(r) && weekdays.some(d => r.dayBreakdown?.[d]?.type === "claimed")).length
                  : activeFilter === "excluded" ? results.filter(r =>  isExcluded(r)).length
                  : results.filter(r => !isExcluded(r)).length;
   const filterLabel = activeFilter === "met"      ? "Met Criteria"
                     : activeFilter === "notmet"   ? "Not Met Criteria"
+                    : activeFilter === "reacted"  ? "Reacted, No Bio"
                     : activeFilter === "excluded" ? "Excluded Employees"
                     : "All Employees";
   const filterBadgeClass = activeFilter === "met" ? "bgn" : activeFilter === "notmet" ? "brd" : "";
@@ -809,12 +830,12 @@ function renderTable() {
       <div class="tbar-left">
         <span class="tbar-title">${filterLabel}</span>
         <span class="badge ${filterBadgeClass}" style="${filterBadgeClass?"":"background:var(--s2);color:var(--t2);border:1px solid var(--bd2)"}">${tabTotal}</span>
-        <span style="font-size:11px;color:var(--mu);font-family:var(--mo)">${activeFilter === "excluded" ? "view only · not included in emails" : showDays ? "day-by-day breakdown" : "click a card above to see day breakdown"}</span>
+        <span style="font-size:11px;color:var(--mu);font-family:var(--mo)">${activeFilter === "excluded" ? "view only · not included in emails" : activeFilter === "reacted" ? "reacted in Ullen Ayyah (WFC/WFB) but no biometric found" : showDays ? "day-by-day breakdown" : "click a card above to see day breakdown"}</span>
         ${visible.length < tabTotal ? `<span style="font-size:10px;color:var(--mu);font-family:var(--mo);border-left:1px solid var(--bd2);padding-left:10px;margin-left:2px">Showing ${visible.length} of ${tabTotal}</span>` : ""}
       </div>
       <div class="tbar-right">
         ${Object.values(columnFilters).some(v=>v) ? `<button class="btn btn-gh btn-sm" onclick="clearAllColFilters()" style="font-size:10px;padding:3px 8px">✕ Clear filters</button>` : ""}
-        <button class="btn btn-gh btn-sm" onclick="exportVisible()" style="font-size:11px;width:190px;justify-content:center" title="Export current view to CSV">Export</button>
+        <button class="btn btn-gh" onclick="exportVisible()" style="font-size:12px;font-weight:500;width:190px;justify-content:center;padding:5px 10px;border-radius:6px" title="Export current view to CSV">Export</button>
         <div class="search-wrap">
           <input type="text" placeholder="Search…" value="${searchTerm.replace(/"/g,'&quot;')}" oninput="doSearch(this.value)" id="tbl-search">
           <span class="si"><svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg></span>
