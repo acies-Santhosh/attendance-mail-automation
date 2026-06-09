@@ -14,41 +14,55 @@
   --gn:#3fb950;--gnd:rgba(63,185,80,.12);
   --rd:#f85149;--rdd:rgba(248,81,73,.1);
   --pu:#bc8cff;--pud:rgba(188,140,255,.12);
-  --bl:#58a6ff;
+  --bl:#58a6ff;--or:#f0883e;--ord:rgba(240,136,62,.12);
   --t1:#e6edf3;--t2:#8b949e;--mu:#484f58;
   --mo:'JetBrains Mono',monospace;--sa:'Space Grotesk',sans-serif;--r:8px;
 }
+[data-theme="light"]{
+  --bg:#eef0f4;--s1:#ffffff;--s2:#f0f2f6;
+  --bd:#dde1e7;--bd2:#c4cad4;
+  --ac:#7c5200;--acd:#fef3cd;
+  --gn:#166534;--gnd:#dcfce7;
+  --rd:#991b1b;--rdd:#fee2e2;
+  --pu:#6b21a8;--pud:#f3e8ff;
+  --bl:#1d4ed8;--or:#9a3412;--ord:#ffedd5;
+  --t1:#111827;--t2:#4b5563;--mu:#9ca3af;
+}
 body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh;font-size:14px}
-.topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:20}
+/* TOPBAR */
+.topbar{padding:14px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:10}
 .logo{width:26px;height:26px;background:var(--ac);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
 .title{font-size:13px;font-weight:600;letter-spacing:.02em}
 .sub{font-size:10px;color:var(--t2);font-family:var(--mo);margin-left:auto}
-.stepper{display:flex;align-items:center;padding:12px 28px;border-bottom:1px solid var(--bd);gap:0;position:sticky;top:55px;background:var(--bg);z-index:19}
+/* STEPPER */
+.stepper{display:flex;align-items:center;padding:12px 28px;border-bottom:1px solid var(--bd);gap:0}
 .st{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);font-family:var(--mo);white-space:nowrap}
 .st.active{color:var(--ac)}.st.done{color:var(--gn)}
 .st-n{width:18px;height:18px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
 .st-line{flex:1;height:1px;background:var(--bd);margin:0 8px;min-width:20px}
-/* Sticky action bar — visible on screen 2 only */
-.actionbar{padding:9px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;position:sticky;top:98px;background:var(--bg);z-index:18;flex-wrap:wrap}
-.ab-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.main{padding:22px 28px;max-width:1200px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+/* MAIN */
+.main{padding:22px 28px;max-width:1200px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+/* UPLOAD */
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.uz{background:var(--s1);border:1px dashed var(--bd2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;position:relative}
+.uz{background:var(--s1);border:1px dashed var(--bd2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;display:block}
 .uz:hover{border-color:var(--ac);background:var(--s2)}
 .uz.loaded{border-style:solid;border-color:var(--gn)}
 .uz.drag{border-color:var(--ac);background:var(--acd)}
-.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.uz input{display:none}
 .uz-tag{font-size:9px;font-family:var(--mo);color:var(--mu);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
 .uz-label{font-size:13px;font-weight:600;margin-bottom:2px}
 .uz-desc{font-size:11px;color:var(--t2);margin-bottom:7px;line-height:1.5}
 .uz-status{font-size:11px;font-family:var(--mo);color:var(--mu)}
 .uz-status.ok{color:var(--gn)}
+/* WEEK ROW */
 .week-row{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:11px 14px;flex-wrap:wrap}
 .wl{font-size:11px;color:var(--t2);font-family:var(--mo);white-space:nowrap}
 .week-row input[type=date]{background:var(--s2);border:1px solid var(--bd2);color:var(--t1);font-family:var(--mo);font-size:12px;padding:5px 8px;border-radius:5px;outline:none}
 .week-row input[type=date]:focus{border-color:var(--ac)}
 .wdisp{font-size:12px;color:var(--ac);font-family:var(--mo);margin-left:auto}
+/* ERRORS */
 .err{background:var(--rdd);border:1px solid var(--rd);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--rd);font-family:var(--mo);white-space:pre-wrap;line-height:1.6}
+/* BUTTONS */
 .btn{padding:9px 18px;border-radius:var(--r);font-family:var(--sa);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;letter-spacing:.01em;display:inline-flex;align-items:center;gap:6px}
 .btn:active{transform:scale(.98)}.btn:disabled{opacity:.3;cursor:not-allowed}
 .btn-ac{background:var(--ac);color:#000}.btn-ac:not(:disabled):hover{opacity:.88}
@@ -56,13 +70,18 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sa);min-height:100vh
 .btn-gn{background:var(--gn);color:#000}.btn-gn:not(:disabled):hover{opacity:.88}
 .btn-rd{background:var(--rd);color:#fff}.btn-rd:not(:disabled):hover{opacity:.88}
 .btn-sm{padding:5px 10px;font-size:11px}
+/* STATS */
 .stats{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.scard{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;flex:1;min-width:90px}
+.scard{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;flex:1;min-width:90px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.scard:hover{border-color:var(--bd2);background:var(--s2)}
+.scard.active-filter{border-color:var(--ac);background:var(--acd)}
 .sval{font-size:22px;font-weight:700;line-height:1;margin-bottom:2px}
 .sval.ac{color:var(--ac)}.sval.rd{color:var(--rd)}.sval.gn{color:var(--gn)}
 .slbl{font-size:10px;color:var(--t2);font-family:var(--mo)}
-.twrap{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;overflow-x:auto}
-.tbar{padding:9px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* TABLE */
+.twrap{background:var(--s1);border:1px solid var(--bd);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden}
+.twrap-scroll{overflow-x:auto}
+.tbar{padding:9px 14px;display:flex;align-items:center;gap:8px;background:var(--s1);border-radius:var(--r) var(--r) 0 0;border:1px solid var(--bd);border-bottom:1px solid var(--bd);position:sticky;top:53px;z-index:8}
 .tbar-title{font-size:11px;font-weight:600;color:var(--t2);font-family:var(--mo);text-transform:uppercase;letter-spacing:.06em}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
 thead th{padding:8px 12px;text-align:left;font-family:var(--mo);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);background:var(--s2);border-bottom:1px solid var(--bd);white-space:nowrap}
@@ -75,34 +94,56 @@ td.nm{font-weight:600;font-size:13px;white-space:nowrap}
 td.mo{font-family:var(--mo);font-size:11px;color:var(--t2)}
 td.rb{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--rd)}
 td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
+/* PILLS */
 .dp{font-size:9px;font-family:var(--mo);padding:2px 6px;border-radius:20px;white-space:nowrap;display:inline-block}
-.po{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
-.pl{background:var(--acd);color:var(--ac);border:1px solid rgba(230,168,23,.25)}
-.pe{background:var(--pud);color:var(--pu);border:1px solid rgba(188,140,255,.25)}
-.pa{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.2)}
-.pr{background:rgba(88,166,255,.1);color:var(--bl);border:1px solid rgba(88,166,255,.2)}
+.po{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.3)}
+.pl{background:var(--acd);color:var(--ac);border:1px solid rgba(230,168,23,.3)}
+.pe{background:var(--pud);color:var(--pu);border:1px solid rgba(188,140,255,.3)}
+.pa{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.25)}
+.pr{background:rgba(88,166,255,.1);color:var(--bl);border:1px solid rgba(88,166,255,.25)}
+.pw{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+.pc{background:rgba(240,136,62,.15);color:var(--or);border:1px solid rgba(240,136,62,.4)}
+.pn{background:rgba(72,79,88,.15);color:var(--mu);border:1px solid rgba(72,79,88,.3)}
+/* Light theme pills — solid pastels, high contrast */
+[data-theme="light"] .po{background:#dcfce7;color:#14532d;border-color:#86efac}
+[data-theme="light"] .pl{background:#fef9c3;color:#713f12;border-color:#fde047}
+[data-theme="light"] .pe{background:#f3e8ff;color:#581c87;border-color:#d8b4fe}
+[data-theme="light"] .pa{background:#fee2e2;color:#7f1d1d;border-color:#fca5a5}
+[data-theme="light"] .pr{background:#dbeafe;color:#1e3a8a;border-color:#93c5fd}
+[data-theme="light"] .pw{background:#e0f2fe;color:#0c4a6e;border-color:#7dd3fc}
+[data-theme="light"] .pc{background:#ffedd5;color:#7c2d12;border-color:#fdba74}
+[data-theme="light"] .pn{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
+/* Light theme structural polish */
+[data-theme="light"] .scard{box-shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04)}
+[data-theme="light"] .scard:hover{box-shadow:0 3px 8px rgba(0,0,0,.1)}
+[data-theme="light"] .twrap{box-shadow:0 1px 4px rgba(0,0,0,.06)}
+[data-theme="light"] table thead th{background:#f0f2f6}
+[data-theme="light"] .tbar{background:#f8f9fb;border-bottom:1px solid var(--bd)}
+[data-theme="light"] .btn-gh{border-color:var(--bd2);color:var(--t2)}
+[data-theme="light"] .btn-gh:hover{border-color:var(--t1);color:var(--t1)}
+[data-theme="light"] .scard.active-filter{box-shadow:0 0 0 2px var(--ac)}
+/* Met / Not Met badges in light theme */
+[data-theme="light"] .bgn{background:#dcfce7;color:#166534;border:1px solid #86efac}
+[data-theme="light"] .brd{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+/* BADGE */
 .badge{font-size:10px;font-family:var(--mo);padding:2px 8px;border-radius:20px;display:inline-block}
-.brd{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.25)}
-.bgn{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
+.brd{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,81,73,.3)}
+.bgn{background:var(--gnd);color:var(--gn);border:1px solid rgba(63,185,80,.3)}
+[data-theme="light"] .brd{background:rgba(185,28,28,.1);border-color:rgba(185,28,28,.35)}
+[data-theme="light"] .bgn{background:rgba(17,99,41,.1);border-color:rgba(17,99,41,.35)}
+/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:600px;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:560px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
 .mhdr{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .mhdr h3{font-size:12px;font-weight:600;font-family:var(--mo);color:var(--t2)}
 .mcls{background:none;border:none;color:var(--mu);cursor:pointer;font-size:20px;line-height:1;padding:0 4px}
 .mcls:hover{color:var(--t1)}
 .mbdy{padding:18px;overflow-y:auto;flex:1}
 .epre{font-size:12px;font-family:var(--mo);color:var(--t1);white-space:pre-wrap;line-height:1.7;background:var(--s2);border-radius:6px;padding:14px}
-.etarea{font-size:12px;font-family:var(--mo);color:var(--t1);white-space:pre-wrap;line-height:1.7;background:var(--s2);border:1px solid var(--bd2);border-radius:6px;padding:14px;width:100%;resize:vertical;min-height:340px;outline:none}
-.etarea:focus{border-color:var(--ac)}
 .emeta{font-size:11px;font-family:var(--mo);color:var(--t2);background:var(--s2);border-radius:6px;padding:10px 12px;margin-bottom:12px;line-height:2}
 .emeta strong{color:var(--t1)}
-.tpl-hint{font-size:12px;color:var(--t2);background:var(--s2);border-radius:6px;padding:12px 14px;margin-bottom:12px;line-height:1.6}
-.tpl-hint p{margin-bottom:8px;font-size:11px;color:var(--mu);font-family:var(--mo)}
-.tpl-tokens{display:flex;flex-wrap:wrap;gap:8px}
-.tpl-token{display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--bd2);border-radius:6px;padding:5px 10px}
-.tpl-token code{font-family:var(--mo);font-size:11px;color:var(--ac)}
-.tpl-token span{font-size:11px;color:var(--t2)}
 .mftr{padding:12px 18px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px}
+/* CONFIRM DIALOG */
 .confirm-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:20px 24px;display:flex;flex-direction:column;gap:14px}
 .confirm-title{font-size:15px;font-weight:700}
 .confirm-sub{font-size:12px;color:var(--t2);line-height:1.6}
@@ -110,8 +151,10 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
 .confirm-list-item{font-size:12px;font-family:var(--mo);color:var(--t1);padding:3px 0;border-bottom:1px solid var(--bd)}
 .confirm-list-item:last-child{border-bottom:none}
 .confirm-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* PROGRESS */
 .prog-wrap{background:var(--s2);border-radius:4px;height:4px;overflow:hidden;margin-top:6px;width:100%}
 .prog-bar{height:100%;background:var(--gn);transition:width .4s;border-radius:4px}
+/* DONE */
 .done-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:36px;text-align:center}
 .done-icon{font-size:44px;margin-bottom:14px}
 .done-title{font-size:20px;font-weight:700;margin-bottom:8px;color:var(--gn)}
@@ -119,18 +162,55 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
 .done-stat{background:var(--s2);border-radius:var(--r);padding:12px;text-align:center}
 .done-stat .n{font-size:24px;font-weight:700}
 .done-stat .l{font-size:10px;color:var(--t2);font-family:var(--mo);margin-top:2px}
+/* SPINNER */
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:sp .6s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
+/* SETUP BANNER */
+.setup-banner{background:var(--acd);border:1px solid var(--ac);border-radius:var(--r);padding:14px 16px;font-size:12px;color:var(--t1);line-height:1.7}
+.setup-banner code{background:var(--s2);padding:1px 5px;border-radius:3px;font-family:var(--mo);font-size:11px;color:var(--ac)}
+/* THEME TOGGLE */
+.theme-btn{background:var(--s2);border:1px solid var(--bd2);color:var(--t2);border-radius:20px;padding:4px 12px;font-size:11px;font-family:var(--mo);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
+.theme-btn:hover{border-color:var(--t1);color:var(--t1)}
+/* SEARCH */
+.search-wrap{position:relative;flex-shrink:0}
+.search-wrap input{background:var(--s2);border:1px solid var(--bd2);color:var(--t1);font-family:var(--mo);font-size:12px;padding:5px 28px 5px 10px;border-radius:6px;outline:none;width:190px;transition:border-color .15s}
+.search-wrap input:focus{border-color:var(--ac)}
+.search-wrap input::placeholder{color:var(--mu)}
+.search-wrap .si{position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;display:flex;align-items:center}
+.search-wrap .si svg{width:13px;height:13px;stroke:var(--mu);fill:none;stroke-width:2;stroke-linecap:round}
+/* TBAR layout */
+.tbar-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0;overflow:hidden}
+.tbar-left span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+/* COLUMN FILTER */
+thead th{position:relative}
+.cf-btn{background:none;border:none;cursor:pointer;padding:0 0 0 4px;color:var(--mu);font-size:10px;vertical-align:middle;line-height:1;transition:color .15s}
+.cf-btn:hover,.cf-btn.active{color:var(--ac)}
+.cf-dd{position:fixed;z-index:500;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;width:280px;max-height:360px;display:flex;flex-direction:column;box-shadow:0 10px 36px rgba(0,0,0,.45);overflow:hidden}
+.cf-dd-search{padding:10px 12px;border-bottom:1px solid var(--bd)}
+.cf-dd-search input{width:100%;background:var(--s2);border:1px solid var(--bd2);color:var(--t1);font-family:var(--mo);font-size:12px;padding:6px 10px;border-radius:6px;outline:none}
+.cf-dd-search input:focus{border-color:var(--ac)}
+.cf-dd-search input::placeholder{color:var(--mu)}
+.cf-list{overflow-y:auto;flex:1;padding:4px 0}
+.cf-item{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;font-size:13px;font-family:var(--mo);color:var(--t1);user-select:none}
+.cf-item:hover{background:var(--s2)}
+.cf-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--ac);flex-shrink:0;cursor:pointer}
+.cf-item.sel-all{border-bottom:1px solid var(--bd);font-weight:700;font-size:14px;padding:9px 14px;color:var(--t1)}
+.cf-footer{padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:center}
+.cf-active-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);display:inline-block;margin-left:2px;vertical-align:middle}
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">AC</div>
   <div class="title">Attendance Compliance</div>
   <div class="sub">Acies Global · weekly review</div>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">☀ Light</button>
 </div>
 
+<!-- STEPPER -->
 <div class="stepper" id="stepper">
   <div class="st active" id="s1"><div class="st-n">1</div>Upload</div>
   <div class="st-line"></div>
@@ -139,58 +219,52 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   <div class="st" id="s3"><div class="st-n">3</div>Send</div>
 </div>
 
-<!-- STICKY ACTION BAR — shown only on screen 2 -->
-<div class="actionbar" id="actionbar" style="display:none">
-  <button class="btn btn-gh btn-sm" onclick="goUpload()">← Re-upload</button>
-  <button class="btn btn-gn btn-sm" id="btn-send-top" onclick="showConfirm()" disabled>Send Emails →</button>
-  <span style="font-size:11px;color:var(--mu);font-family:var(--mo)" id="send-hint-top"></span>
-  <div class="ab-right">
-    <button class="btn btn-gh btn-sm" onclick="showTemplateModal()">✉ Preview &amp; Edit Mail</button>
-  </div>
-</div>
-
 <div class="main" id="main">
 
-  <!-- SCREEN 1: UPLOAD -->
+  <!-- ── SCREEN 1: UPLOAD ── -->
   <div id="screen-upload">
-    <div class="upload-grid">
-      <div class="uz" id="uz-chennai" ondragover="drag(event,'chennai')" ondragleave="undrag('chennai')" ondrop="drop(event,'chennai')">
-        <input type="file" id="f-chennai" onchange="fileChosen('chennai',this)">
-        <div class="uz-tag">Master · Biometric</div>
-        <div class="uz-label">Chennai Attendance</div>
-        <div class="uz-desc">Single sheet · Employee + date columns · time = in office, EL/SCL = leave</div>
-        <div class="uz-status" id="st-chennai">Click or drag to upload</div>
-      </div>
-      <div class="uz" id="uz-bangalore" ondragover="drag(event,'bangalore')" ondragleave="undrag('bangalore')" ondrop="drop(event,'bangalore')">
-        <input type="file" id="f-bangalore" onchange="fileChosen('bangalore',this)">
-        <div class="uz-tag">Master · Manual entry</div>
-        <div class="uz-label">Bangalore Attendance</div>
-        <div class="uz-desc">CSV or XLSX · WFO / SCL / MSL per date column</div>
-        <div class="uz-status" id="st-bangalore">Click or drag to upload</div>
-      </div>
-      <div class="uz" id="uz-zoho" ondragover="drag(event,'zoho')" ondragleave="undrag('zoho')" ondrop="drop(event,'zoho')">
-        <input type="file" id="f-zoho" onchange="fileChosen('zoho',this)">
-        <div class="uz-tag">Secondary · Zoho export</div>
-        <div class="uz-label">Zoho Leave Report</div>
-        <div class="uz-desc">XLS / XLSX · EL / SCL / ML / MSL / LWP · half-day codes supported</div>
-        <div class="uz-status" id="st-zoho">Click or drag to upload</div>
-      </div>
-      <div class="uz" id="uz-ullen" ondragover="drag(event,'ullen')" ondragleave="undrag('ullen')" ondrop="drop(event,'ullen')">
-        <input type="file" id="f-ullen" onchange="fileChosen('ullen',this)">
-        <div class="uz-tag">Secondary · Regularisation</div>
-        <div class="uz-label">Ullen Ayyah Report</div>
-        <div class="uz-desc">CSV / XLSX · WFC / WFB / WFCO / WR / L per date · employee master</div>
-        <div class="uz-status" id="st-ullen">Click or drag to upload</div>
-      </div>
+    <div id="setup-banner" class="setup-banner" style="display:none">
+      ⚠️ <strong>First-time setup needed.</strong> Open Google Apps Script → run <code>setupSheets()</code> once to create the log sheets, then paste your Spreadsheet ID in <code>Code.gs</code> CONFIG and redeploy.
     </div>
 
-    <div class="uz" id="uz-excuse" ondragover="drag(event,'excuse')" ondragleave="undrag('excuse')" ondrop="drop(event,'excuse')">
-      <input type="file" id="f-excuse" onchange="fileChosen('excuse',this)">
+    <div class="upload-grid">
+      <label class="uz" id="uz-chennai" ondragover="drag(event,'chennai')" ondragleave="undrag('chennai')" ondrop="drop(event,'chennai')">
+        <input type="file" id="f-chennai" accept=".xlsx,.xls,.xlsm,.csv" onchange="fileChosen('chennai',this)">
+        <div class="uz-tag">Master · Biometric</div>
+        <div class="uz-label">Chennai Attendance</div>
+        <div class="uz-desc">Daily sheets: 18 May, 19 May … · Employee ID + Clock In</div>
+        <div class="uz-status" id="st-chennai">Click or drag to upload</div>
+      </label>
+      <label class="uz" id="uz-bangalore" ondragover="drag(event,'bangalore')" ondragleave="undrag('bangalore')" ondrop="drop(event,'bangalore')">
+        <input type="file" id="f-bangalore" accept=".xlsx,.xls,.xlsm,.csv" onchange="fileChosen('bangalore',this)">
+        <div class="uz-tag">Master · Manual entry</div>
+        <div class="uz-label">Bangalore Attendance</div>
+        <div class="uz-desc">Wide format · WFO / SCL / MSL per date column</div>
+        <div class="uz-status" id="st-bangalore">Click or drag to upload</div>
+      </label>
+      <label class="uz" id="uz-zoho" ondragover="drag(event,'zoho')" ondragleave="undrag('zoho')" ondrop="drop(event,'zoho')">
+        <input type="file" id="f-zoho" accept=".xlsx,.xls,.xlsm,.csv" onchange="fileChosen('zoho',this)">
+        <div class="uz-tag">Secondary · Zoho export</div>
+        <div class="uz-label">Zoho Leave Report</div>
+        <div class="uz-desc">EL / SCL / ML / MSL / LWP · half-day codes supported</div>
+        <div class="uz-status" id="st-zoho">Click or drag to upload</div>
+      </label>
+      <label class="uz" id="uz-ullen" ondragover="drag(event,'ullen')" ondragleave="undrag('ullen')" ondrop="drop(event,'ullen')">
+        <input type="file" id="f-ullen" accept=".xlsx,.xls,.csv" onchange="fileChosen('ullen',this)">
+        <div class="uz-tag">Secondary · Regularisation</div>
+        <div class="uz-label">Ullen Ayyah Report</div>
+        <div class="uz-desc">WFC / WFB / WFCO / WR / L per date · employee master</div>
+        <div class="uz-status" id="st-ullen">Click or drag to upload</div>
+      </label>
+    </div>
+
+    <label class="uz" id="uz-excuse" ondragover="drag(event,'excuse')" ondragleave="undrag('excuse')" ondrop="drop(event,'excuse')">
+      <input type="file" id="f-excuse" accept=".xlsx,.xls,.csv" onchange="fileChosen('excuse',this)">
       <div class="uz-tag">Optional · Permissions</div>
-      <div class="uz-label">Excuse / Permitted WFH Sheet</div>
+      <div class="uz-label">Excuse Sheet</div>
       <div class="uz-desc">Employee ID + Date — manager-approved absences that count toward 3 days</div>
       <div class="uz-status" id="st-excuse">Optional — click or drag to upload</div>
-    </div>
+    </label>
 
     <div class="week-row">
       <span class="wl">WEEK START (Mon)</span>
@@ -210,21 +284,24 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
     </div>
   </div>
 
-  <!-- SCREEN 2: PREVIEW -->
+  <!-- ── SCREEN 2: PREVIEW ── -->
   <div id="screen-preview" style="display:none">
     <div class="stats" id="stats-row"></div>
-    <div class="twrap" id="table-nc"></div>
-    <div class="twrap" id="table-c"></div>
+    <div id="excluded-banner"></div>
+    <div id="actionbar" style="display:none;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+      <button class="btn btn-gn" id="btn-send" onclick="showConfirm()">Send Emails →</button>
+      <span style="font-size:11px;color:var(--mu);font-family:var(--mo)" id="send-hint"></span>
+    </div>
+    <div id="table-all" style="border-radius:var(--r)"></div>
   </div>
 
-  <!-- SCREEN 3: DONE -->
+  <!-- ── SCREEN 3: DONE ── -->
   <div id="screen-done" style="display:none">
     <div class="done-card">
       <div class="done-icon">✅</div>
       <div class="done-title" id="done-title">Done!</div>
       <div class="done-grid" id="done-grid"></div>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
-        <button class="btn btn-gh" onclick="goPreview()">← Back to Preview</button>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
         <button class="btn btn-gh" onclick="goUpload()">Process another week</button>
       </div>
     </div>
@@ -233,7 +310,7 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
 
 </div>
 
-<!-- CONFIRM DIALOG -->
+<!-- CONFIRM DIALOG (hidden by default) -->
 <div class="overlay" id="overlay-confirm" style="display:none" onclick="if(event.target===this)closeConfirm()">
   <div class="confirm-box" style="max-width:520px;width:95vw">
     <div class="confirm-title">Send compliance emails?</div>
@@ -250,7 +327,18 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   </div>
 </div>
 
-<!-- EMAIL PREVIEW MODAL (per employee) -->
+<!-- COLUMN FILTER DROPDOWN -->
+<div class="cf-dd" id="cf-dd" style="display:none" onclick="event.stopPropagation()">
+  <div class="cf-dd-search"><input type="text" id="cf-val-search" placeholder="Search values…" oninput="cfValSearch(this.value)"></div>
+  <div class="cf-list" id="cf-list"></div>
+  <div class="cf-footer">
+    <button class="btn btn-gh btn-sm" onclick="cfSelectAll()">Select All</button>
+    <button class="btn btn-gh btn-sm" onclick="cfClearAll()">Clear</button>
+    <button class="btn btn-ac btn-sm" style="margin-left:auto" onclick="cfApply()">Apply</button>
+  </div>
+</div>
+
+<!-- EMAIL PREVIEW MODAL -->
 <div class="overlay" id="overlay-preview" style="display:none" onclick="if(event.target===this)closePreview()">
   <div class="modal">
     <div class="mhdr"><h3 id="prev-name">EMAIL PREVIEW</h3><button class="mcls" onclick="closePreview()">×</button></div>
@@ -262,77 +350,33 @@ td.rg{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--gn)}
   </div>
 </div>
 
-<!-- TEMPLATE EDITOR MODAL -->
-<div class="overlay" id="overlay-template" style="display:none" onclick="if(event.target===this)closeTemplateModal()">
-  <div class="modal" style="width:660px">
-    <div class="mhdr">
-      <h3>PREVIEW &amp; EDIT EMAIL TEMPLATE</h3>
-      <button class="mcls" onclick="closeTemplateModal()">×</button>
-    </div>
-    <div class="mbdy">
-      <div class="tpl-hint">
-        <p>AVAILABLE TOKENS — replaced automatically per employee</p>
-        <div class="tpl-tokens">
-          <div class="tpl-token"><code>{{name}}</code><span>Employee's full name</span></div>
-          <div class="tpl-token"><code>{{weekLabel}}</code><span>Week date range</span></div>
-          <div class="tpl-token"><code>{{breakdown}}</code><span>Mon–Fri day-by-day summary</span></div>
-          <div class="tpl-token"><code>{{total}}</code><span>Total effective days (e.g. 2)</span></div>
-          <div class="tpl-token"><code>{{missing}}</code><span>Shortfall (e.g. 1 day)</span></div>
-        </div>
-      </div>
-      <textarea class="etarea" id="tpl-textarea" spellcheck="false"></textarea>
-    </div>
-    <div class="mftr">
-      <button class="btn btn-gh btn-sm" onclick="resetTemplate()">Reset to default</button>
-      <button class="btn btn-gh btn-sm" onclick="closeTemplateModal()">Cancel</button>
-      <button class="btn btn-gn btn-sm" onclick="saveTemplate()">Save template</button>
-    </div>
-  </div>
-</div>
-
 <script>
+// ── STATE ──────────────────────────────────────────────────────────────────
 const files = { chennai: null, bangalore: null, zoho: null, ullen: null, excuse: null };
 const fileExts = { chennai: "xlsx", bangalore: "csv", zoho: "xls", ullen: "csv", excuse: "xlsx" };
 const required = ["chennai","bangalore","zoho","ullen"];
-let results = [], weekdays = [], weekLabel = "", selected = new Set();
+let results = [], weekdays = [], weekLabel = "", selected = new Set(), excludedNames = [], claimedNotPresent = [], officeNotUllen = [], zohoTotal = 0, activeFilter = null, searchTerm = "", visibleRows = [];
 
-const DEFAULT_TEMPLATE = `Dear {{name}},
-
-This is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).
-
-Your attendance summary for the week of {{weekLabel}}:
-
-{{breakdown}}
-
-  Total effective days : {{total}} / 5
-  Required             : 3 / 5
-  Shortfall            : {{missing}}
-
-If you believe this is incorrect, please reach out to your manager or HR.
-
-Going forward, please ensure you are present in the office for at least 3 working days each week.
-
-Regards,
-HR & Administration`;
-
-let emailTemplate = DEFAULT_TEMPLATE;
-
-// Build email body for a given employee using the current template
-function buildBody(r) {
-  const lbl = {office:"✓  Office",leave:"✓  Leave",half_leave:"✓  Half-day leave",excuse:"✓  Approved excuse",absent:"✗  Absent",remote:"✗  Remote (not counted)"};
-  const breakdown = weekdays.map((d,i) => {
-    const t = r.dayBreakdown[d]?.type || "absent";
-    return `  ${DAY_NAMES[i].padEnd(4)}  ${lbl[t] || "✗  Absent"}`;
-  }).join("\n");
-  const missing = Math.max(0, 3 - r.total);
-  return emailTemplate
-    .replace(/\{\{name\}\}/g, r.name)
-    .replace(/\{\{weekLabel\}\}/g, weekLabel)
-    .replace(/\{\{breakdown\}\}/g, breakdown)
-    .replace(/\{\{total\}\}/g, r.total)
-    .replace(/\{\{missing\}\}/g, missing + " day" + (missing !== 1 ? "s" : ""));
+// ── EXCLUDED EMPLOYEES (view-only, never emailed) ──────────────────────────
+const EXCLUDED_EMP = new Set([
+  "sundar bhuvaneswaran",
+  "mukund raghunath",
+  "anbarasu m",
+  "vijay natt krishna",
+  "kartik raghunath",
+  "vamsi priyatham reddy",
+  "shankar kadayam veeraraghavan",
+  "pravin kumar",
+]);
+function isExcluded(r) {
+  return EXCLUDED_EMP.has((r.name || "").trim().toLowerCase());
 }
+// Column filters: colKey → Set of allowed values (null = all)
+let columnFilters = {};
+// Active dropdown state
+let cfCol = null, cfPending = new Set(), cfAllVals = [], cfColCounts = {};
 
+// ── WEEK DISPLAY ───────────────────────────────────────────────────────────
 function updateWeekDisplay() {
   const s = document.getElementById("wstart").value;
   const e = document.getElementById("wend").value;
@@ -346,17 +390,17 @@ function updateWeekDisplay() {
 }
 updateWeekDisplay();
 
+// ── FILE UPLOAD ────────────────────────────────────────────────────────────
 function drag(e, key) { e.preventDefault(); document.getElementById("uz-"+key).classList.add("drag"); }
 function undrag(key) { document.getElementById("uz-"+key).classList.remove("drag"); }
 function drop(e, key) { e.preventDefault(); undrag(key); const f = e.dataTransfer.files[0]; if (f) readFile(key, f); }
 function fileChosen(key, inp) { if (inp.files[0]) readFile(key, inp.files[0]); }
 
 function readFile(key, file) {
-  const ext = file.name.split(".").pop().toLowerCase();
-  fileExts[key] = ext;
+  fileExts[key] = file.name.split(".").pop().toLowerCase();
   const reader = new FileReader();
   reader.onload = ev => {
-    files[key] = ev.target.result.split(",")[1];
+    files[key] = ev.target.result.split(",")[1]; // base64
     const el = document.getElementById("uz-"+key);
     el.classList.add("loaded"); el.classList.remove("drag");
     const st = document.getElementById("st-"+key);
@@ -376,6 +420,7 @@ function checkReady() {
   else hint.textContent = `${required.filter(k=>!files[k]).length} required file(s) still needed`;
 }
 
+// ── PROCESS ────────────────────────────────────────────────────────────────
 function processFiles() {
   const btn = document.getElementById("btn-process");
   btn.disabled = true;
@@ -388,7 +433,13 @@ function processFiles() {
     zohoB64:      files.zoho,
     ullenB64:     files.ullen,
     excuseB64:    files.excuse || null,
-    fileTypes:    { ...fileExts },
+    fileTypes: {
+      chennai:   fileExts.chennai,
+      bangalore: fileExts.bangalore,
+      zoho:      fileExts.zoho,
+      ullen:     fileExts.ullen,
+      excuse:    fileExts.excuse,
+    },
     weekStart:    document.getElementById("wstart").value,
     weekEnd:      document.getElementById("wend").value,
   };
@@ -402,8 +453,15 @@ function processFiles() {
 function onProcessed(res) {
   const btn = document.getElementById("btn-process");
   btn.disabled = false; btn.innerHTML = "Process &amp; Preview →";
+
   if (!res.ok) { showError(res.error); return; }
-  results = res.results; weekdays = res.weekdays;
+
+  results            = res.results;
+  weekdays           = res.weekdays;
+  zohoTotal          = res.zohoTotal || results.length;
+  excludedNames      = res.excludedNames || [];
+  claimedNotPresent  = res.claimedNotPresent || [];
+  officeNotUllen     = res.officeNotUllen || [];
   renderPreview();
 }
 
@@ -418,14 +476,33 @@ function showError(msg) {
   el.textContent = msg; el.style.display = "block";
 }
 
+// ── RENDER PREVIEW ─────────────────────────────────────────────────────────
+function locationBadge(loc) {
+  if (!loc || loc === "—") return '<span style="color:var(--mu);font-family:var(--mo);font-size:11px">—</span>';
+  const l = loc.trim().toLowerCase();
+  const display = (l === "bengaluru" || l === "bangalore") ? "Bengaluru" : loc.trim();
+  return `<span style="font-family:var(--mo);font-size:11px;color:var(--t1)">${display}</span>`;
+}
+
 const TYPE_PILL = {
-  office:     '<span class="dp po">Office</span>',
+  office:     '<span class="dp po">In Office</span>',
+  wfco:       '<span class="dp pw">WFCO</span>',
   leave:      '<span class="dp pl">Leave</span>',
-  half_leave: '<span class="dp pl">½ Leave</span>',
-  excuse:     '<span class="dp pe">Excused</span>',
-  absent:     '<span class="dp pa">Absent</span>',
   remote:     '<span class="dp pr">Remote</span>',
+  claimed:    '<span class="dp pc">⚠ Reacted, No Bio</span>',
+  no_record:  '<span class="dp pn">No Record</span>',
+  half_leave: '<span class="dp pl">Leave</span>',
+  excuse:     '<span class="dp pe">Excused</span>',
+  absent:     '<span class="dp pn">No Record</span>',
 };
+
+// ── THEME ─────────────────────────────────────────────────────────────────
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute("data-theme", isDark ? "" : "light");
+  document.getElementById("theme-btn").textContent = isDark ? "☀ Light" : "☾ Dark";
+}
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri"];
 
 function renderPreview() {
@@ -433,130 +510,431 @@ function renderPreview() {
   document.getElementById("screen-upload").style.display = "none";
   document.getElementById("screen-done").style.display = "none";
   document.getElementById("screen-preview").style.display = "";
-  document.getElementById("actionbar").style.display = "flex";
+  // actionbar shown only in Not Met view — hidden here, toggled in setFilter/renderTable
+  document.getElementById("actionbar").style.display = "none";
 
-  const nc = results.filter(r => !r.compliant);
-  const cp = results.filter(r =>  r.compliant);
-  selected = new Set(nc.map(r => r.id));
+  // Excluded employees are shown separately — remove them from met/not-met counts
+  const nc = results.filter(r => !r.compliant && !isExcluded(r));
+  const cp = results.filter(r =>  r.compliant && !isExcluded(r));
+  // Auto-select all non-excluded not-met employees
+  selected = new Set(nc.filter(r => !isExcluded(r)).map(r => r.id));
 
+  // ── EXCLUDED BADGE ──────────────────────────────────────────
+  const excBadge = excludedNames.length > 0 ? `
+    <div style="background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+      <span style="font-size:11px;font-family:var(--mo);color:var(--mu);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0">Excluded</span>
+      ${excludedNames.map(n => `<span style="font-size:11px;font-family:var(--mo);background:var(--s2);border:1px solid var(--bd2);border-radius:20px;padding:2px 10px;color:var(--t2)">${n}</span>`).join("")}
+    </div>` : "";
+  document.getElementById("excluded-banner").innerHTML = excBadge;
+
+  // ── STATS (clickable cards) ─────────────────────────────────
+  const excl = results.filter(r => isExcluded(r));
   document.getElementById("stats-row").innerHTML = `
-    <div class="scard"><div class="sval ac">${results.length}</div><div class="slbl">total employees</div></div>
-    <div class="scard"><div class="sval rd">${nc.length}</div><div class="slbl">non-compliant</div></div>
-    <div class="scard"><div class="sval gn">${cp.length}</div><div class="slbl">compliant</div></div>
-    <div class="scard"><div class="sval ac" id="sel-count">${nc.length}</div><div class="slbl">selected to email</div></div>
+    <div class="scard" id="card-all" onclick="setFilter(null)" title="Show all employees">
+      <div class="sval ac">${results.length}</div><div class="slbl">total employees</div>
+    </div>
+    <div class="scard" id="card-met" onclick="setFilter('met')" title="Click to filter">
+      <div class="sval gn">${cp.length}</div><div class="slbl">met criteria</div>
+    </div>
+    <div class="scard" id="card-notmet" onclick="setFilter('notmet')" title="Click to filter">
+      <div class="sval rd">${nc.length}</div><div class="slbl">not met criteria</div>
+    </div>
+    <div class="scard" id="card-excl" onclick="setFilter('excluded')" title="View excluded employees">
+      <div class="sval" style="color:var(--mu)">${excl.length}</div><div class="slbl">excluded</div>
+    </div>
+    <button class="btn btn-gh" onclick="goUpload()" style="margin-left:auto">← Re-upload</button>
   `;
 
-  const dayThs = weekdays.map((d,i) => {
-    const label = new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
-    return `<th>${DAY_NAMES[i]} · ${label}</th>`;
-  }).join("");
-
-  const ncRows = nc.length === 0
-    ? `<tr><td colspan="20" style="text-align:center;padding:24px;color:var(--mu);font-family:var(--mo);font-size:12px">🎉 All employees compliant this week</td></tr>`
-    : nc.map(r => `
-      <tr class="nc" id="row-${r.id}">
-        <td><input type="checkbox" id="chk-${r.id}" checked onchange="toggleSelect('${r.id}')" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer"></td>
-        <td class="nm">${r.name}</td>
-        <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
-        <td class="rb">${r.total} / 5</td>
-        ${weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")}
-        <td><button class="btn btn-gh btn-sm" onclick='showEmailPreview(${JSON.stringify(r).replace(/'/g,"&apos;")})'>Preview</button></td>
-      </tr>`).join("");
-
-  const allChecked = `<input type="checkbox" id="chk-all" checked onchange="toggleAll(this)" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer">`;
-
-  document.getElementById("table-nc").innerHTML = `
-    <div class="tbar">
-      <span class="tbar-title">Non-compliant</span>
-      <span class="badge brd">${nc.length}</span>
-      <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">check/uncheck to include or exclude</span>
-    </div>
-    <table><thead><tr><th>${allChecked}</th><th>Employee</th><th>Email</th><th>Score</th>${dayThs}<th>Preview</th></tr></thead>
-    <tbody>${ncRows}</tbody></table>`;
-
-  const cpRows = cp.map(r => `
-    <tr>
-      <td class="nm">${r.name}</td>
-      <td class="rg">${r.total} / 5</td>
-      ${weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")}
-    </tr>`).join("");
-
-  document.getElementById("table-c").innerHTML = `
-    <div class="tbar">
-      <span class="tbar-title">Compliant</span>
-      <span class="badge bgn">${cp.length}</span>
-      <span style="font-size:11px;color:var(--mu);font-family:var(--mo);margin-left:6px">no emails will be sent</span>
-    </div>
-    <table><thead><tr><th>Employee</th><th>Score</th>${dayThs}</tr></thead>
-    <tbody>${cpRows}</tbody></table>`;
-
+  renderTable();
   updateSendBtn();
+}
+
+function doSearch(val) {
+  searchTerm = val.trim();
+  renderTable();
+  // Re-focus the input after re-render
+  const inp = document.getElementById("tbl-search");
+  if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+}
+
+// ── COLUMN FILTERS ────────────────────────────────────────────────
+
+const TYPE_LABEL = {
+  office:'In Office', wfco:'WFCO', leave:'Leave', remote:'Remote',
+  claimed:'⚠ Reacted, No Bio', no_record:'No Record',
+  half_leave:'Leave', excuse:'Excused', absent:'No Record'
+};
+
+function colValue(r, colKey) {
+  if (colKey.startsWith('day_')) {
+    const date = colKey.slice(4);
+    const type = r.dayBreakdown?.[date]?.type || 'no_record';
+    return TYPE_LABEL[type] || 'No Record';
+  }
+  switch (colKey) {
+    case 'id':       return String(r.id || "—");
+    case 'name':     return r.name || "—";
+    case 'email':    return r.email || "(no email)";
+    case 'location': return r.location || "—";
+    case 'criteria': return r.compliant ? "Met" : "Not Met";
+    default: return "—";
+  }
+}
+
+function openColFilter(colKey, btn) {
+  // Close if same column clicked again
+  if (cfCol === colKey) { closeColFilter(); return; }
+  cfCol = colKey;
+
+  // Build unique values with counts from the currently active view (not all 207)
+  let baseSet = results;
+  if (activeFilter === "met")    baseSet = results.filter(r =>  r.compliant);
+  if (activeFilter === "notmet") baseSet = results.filter(r => !r.compliant);
+  const countMap = {};
+  baseSet.forEach(r => { const v = colValue(r, colKey); countMap[v] = (countMap[v]||0)+1; });
+  cfAllVals = Object.keys(countMap).sort((a,b)=>a.localeCompare(b));
+  // Store counts for display
+  cfColCounts = countMap;
+  // Pending = current active filter for this col, or all values
+  const active = columnFilters[colKey];
+  cfPending = active ? new Set(active) : new Set(cfAllVals);
+
+  cfRenderList(cfAllVals);
+  document.getElementById("cf-val-search").value = "";
+
+  // Position dropdown below the column header (th), not the tiny button
+  const dd = document.getElementById("cf-dd");
+  dd.style.display = "flex";
+  const th = btn.closest("th") || btn;
+  const rect = th.getBoundingClientRect();
+  const ddW = 280, ddH = 360;
+  let left = rect.left;
+  let top  = rect.bottom + 4;
+  // Keep within viewport
+  if (left + ddW > window.innerWidth - 8) left = window.innerWidth - ddW - 8;
+  if (left < 8) left = 8;
+  if (top + ddH > window.innerHeight - 8) top = rect.top - ddH - 4;
+  if (top < 8) top = 8;
+  dd.style.left = left + "px";
+  dd.style.top  = top  + "px";
+
+  setTimeout(() => document.addEventListener("click", cfOutsideClick), 0);
+}
+
+function cfOutsideClick(e) {
+  const dd = document.getElementById("cf-dd");
+  if (dd && !dd.contains(e.target)) closeColFilter();
+}
+
+function closeColFilter() {
+  document.getElementById("cf-dd").style.display = "none";
+  document.removeEventListener("click", cfOutsideClick);
+  cfCol = null;
+}
+
+function cfRenderList(vals) {
+  const allSelected = vals.every(v => cfPending.has(v));
+  const totalCount = vals.reduce((s,v)=>s+(cfColCounts[v]||0),0);
+  document.getElementById("cf-list").innerHTML =
+    `<div class="cf-item sel-all" onclick="cfToggleAll()">
+       <input type="checkbox" ${allSelected?"checked":""} onclick="event.stopPropagation();cfToggleAll()">
+       <span>Select All</span><span style="margin-left:auto;color:var(--mu);font-size:10px">(${totalCount})</span>
+     </div>` +
+    vals.map(v => {
+      const esc = v.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+      const cnt = cfColCounts[v] || 0;
+      return `<div class="cf-item" onclick="cfToggleVal('${esc}')">
+         <input type="checkbox" ${cfPending.has(v)?"checked":""} onclick="event.stopPropagation();cfToggleVal('${esc}')">
+         <span>${v}</span><span style="margin-left:auto;color:var(--mu);font-size:10px;flex-shrink:0">(${cnt})</span>
+       </div>`;
+    }).join("");
+}
+
+function cfValSearch(q) {
+  const filtered = q ? cfAllVals.filter(v => v.toLowerCase().includes(q.toLowerCase())) : cfAllVals;
+  cfRenderList(filtered);
+}
+
+function cfToggleVal(v) {
+  if (cfPending.has(v)) cfPending.delete(v); else cfPending.add(v);
+  cfRenderList(cfAllVals.filter(x => {
+    const q = document.getElementById("cf-val-search").value;
+    return q ? x.toLowerCase().includes(q.toLowerCase()) : true;
+  }));
+}
+
+function cfToggleAll() {
+  const q = document.getElementById("cf-val-search").value;
+  const visible = q ? cfAllVals.filter(v => v.toLowerCase().includes(q.toLowerCase())) : cfAllVals;
+  const allSel = visible.every(v => cfPending.has(v));
+  visible.forEach(v => allSel ? cfPending.delete(v) : cfPending.add(v));
+  cfRenderList(visible);
+}
+
+function cfSelectAll() { cfAllVals.forEach(v => cfPending.add(v)); cfRenderList(cfAllVals); }
+function cfClearAll()  { cfPending.clear(); cfRenderList(cfAllVals); }
+
+function cfApply() {
+  if (cfCol) {
+    // If all values selected = no filter (null); otherwise store the set
+    columnFilters[cfCol] = (cfPending.size === cfAllVals.length) ? null : new Set(cfPending);
+  }
+  closeColFilter();
+  renderTable();
+}
+
+function clearAllColFilters() { columnFilters = {}; renderTable(); }
+
+// Header cell with filter button
+function fhdr(colKey, label) {
+  const hasFilter = columnFilters[colKey] && columnFilters[colKey] !== null;
+  return `${label}<button class="cf-btn${hasFilter?" active":""}" onclick="event.stopPropagation();openColFilter('${colKey}',this)" title="Filter">▼${hasFilter?'<span class="cf-active-dot"></span>':''}</button>`;
+}
+
+function setFilter(f) {
+  activeFilter = (activeFilter === f) ? null : f; // toggle off if same card clicked again
+  searchTerm = ""; // reset search when switching filter
+  // Update card highlight
+  ["card-all","card-met","card-notmet","card-excl"].forEach(id => document.getElementById(id)?.classList.remove("active-filter"));
+  if (activeFilter === "met")      document.getElementById("card-met")?.classList.add("active-filter");
+  if (activeFilter === "notmet")   document.getElementById("card-notmet")?.classList.add("active-filter");
+  if (activeFilter === "excluded") document.getElementById("card-excl")?.classList.add("active-filter");
+  if (activeFilter === null)       document.getElementById("card-all")?.classList.add("active-filter");
+  renderTable();
+}
+
+function renderTable() {
+  let visible = results;
+  if (activeFilter === "met")      visible = results.filter(r =>  r.compliant && !isExcluded(r));
+  if (activeFilter === "notmet")   visible = results.filter(r => !r.compliant && !isExcluded(r));
+  if (activeFilter === "excluded") visible = results.filter(r =>  isExcluded(r));
+  if (activeFilter === null)       visible = results.filter(r => !isExcluded(r));
+
+  // Always sort alphabetically
+  visible = [...visible].sort((a,b) => a.name.localeCompare(b.name));
+
+  // Apply search filter
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    visible = visible.filter(r =>
+      (r.name  || "").toLowerCase().includes(q) ||
+      (r.email || "").toLowerCase().includes(q) ||
+      String(r.id || "").toLowerCase().includes(q)
+    );
+  }
+
+  // Apply column filters
+  for (const [col, vals] of Object.entries(columnFilters)) {
+    if (vals && vals.size > 0) {
+      visible = visible.filter(r => vals.has(colValue(r, col)));
+    }
+  }
+  visibleRows = visible; // keep for export
+
+  const showDays   = activeFilter === "met" || activeFilter === "notmet" || activeFilter === "excluded";
+  const isNotMet   = activeFilter === "notmet";
+  // Tab totals (used for badge + "Showing X of Y")
+  const tabTotal = activeFilter === "met"      ? results.filter(r =>  r.compliant && !isExcluded(r)).length
+                 : activeFilter === "notmet"   ? results.filter(r => !r.compliant && !isExcluded(r)).length
+                 : activeFilter === "excluded" ? results.filter(r =>  isExcluded(r)).length
+                 : results.filter(r => !isExcluded(r)).length;
+  const filterLabel = activeFilter === "met"      ? "Met Criteria"
+                    : activeFilter === "notmet"   ? "Not Met Criteria"
+                    : activeFilter === "excluded" ? "Excluded Employees"
+                    : "All Employees";
+  const filterBadgeClass = activeFilter === "met" ? "bgn" : activeFilter === "notmet" ? "brd" : "";
+
+  // Show/hide Send Emails bar only in Not Met view
+  document.getElementById("actionbar").style.display = isNotMet ? "flex" : "none";
+  if (isNotMet) updateSendBtn();
+
+
+  const colCount = 8 + (showDays ? weekdays.length + 1 : 0); // +1 for score col
+
+  const rows = visible.length === 0
+    ? `<tr><td colspan="${colCount}" style="text-align:center;padding:28px;color:var(--mu);font-family:var(--mo);font-size:12px">No employees match this filter</td></tr>`
+    : visible.map(r => {
+        const excluded    = isExcluded(r);
+        const criteriaBadge = r.compliant
+          ? `<span class="badge bgn">Met</span>`
+          : `<span class="badge brd">Not Met</span>`;
+
+        // Checkbox: only in Not Met view, only for non-excluded non-compliant employees
+        let checkCell = "";
+        if (isNotMet && !r.compliant) {
+          if (excluded) {
+            checkCell = `<td style="text-align:center"><span title="View only — excluded from emails" style="font-family:var(--mo);font-size:10px;color:var(--mu);opacity:.6">view only</span></td>`;
+          } else {
+            const chkd = selected.has(r.id) ? "checked" : "";
+            checkCell = `<td style="text-align:center"><input type="checkbox" id="chk-${r.id}" ${chkd} onchange="toggleSelect('${r.id}')"></td>`;
+          }
+        }
+
+        const rowStyle  = (excluded && activeFilter !== "excluded") ? ' style="opacity:.45"' : '';
+        const empNoCell = `<td class="mo" style="color:var(--t2)">${r.id || "—"}</td>`;
+        const dayCells  = showDays
+          ? weekdays.map(d => `<td>${TYPE_PILL[r.dayBreakdown[d]?.type] || TYPE_PILL.absent}</td>`).join("")
+          : "";
+        const previewCell = showDays && !r.compliant
+          ? `<td><button class="btn btn-gh btn-sm" onclick='showEmailPreview(${JSON.stringify(r).replace(/'/g,"&apos;")})'>Preview</button></td>`
+          : showDays ? `<td></td>` : "";
+        const managerCols = showDays ? "" : `
+          <td class="mo">${r.managerEmail || "—"}</td>`;
+        return `<tr class="${r.compliant?"":"nc"}" id="row-${r.id}"${rowStyle}>
+          ${checkCell}
+          ${empNoCell}
+          <td class="nm">${r.name}${excluded && activeFilter !== "excluded" ? ' <span style="font-family:var(--mo);font-size:9px;color:var(--mu);opacity:.7">(excl.)</span>' : ''}</td>
+          <td class="mo">${r.email || '<span style="color:var(--rd)">no email</span>'}</td>
+          <td>${locationBadge(r.location)}</td>
+          ${showDays ? "" : `<td>${criteriaBadge}</td>`}
+          ${managerCols}
+          ${dayCells}${previewCell}
+        </tr>`;
+      }).join("");
+
+  // Select-all checkbox header — only in Not Met view
+  const selectableVisible = isNotMet ? visible.filter(r => !r.compliant && !isExcluded(r)) : [];
+  const allChecked = selectableVisible.length > 0 && selectableVisible.every(r => selected.has(r.id));
+  const checkAllTh = isNotMet
+    ? `<th style="width:32px;text-align:center"><input type="checkbox" id="chk-all" ${allChecked?"checked":""} onchange="toggleAll(this)" title="Select / deselect all"></th>`
+    : "";
+
+  const dayFilterThs = showDays ? weekdays.map((d,i) => {
+    const label = new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+    return `<th>${fhdr('day_'+d, DAY_NAMES[i]+' · '+label)}</th>`;
+  }).join("") : "";
+
+  document.getElementById("table-all").innerHTML = `
+    <div class="tbar">
+      <div class="tbar-left">
+        <span class="tbar-title">${filterLabel}</span>
+        <span class="badge ${filterBadgeClass}" style="${filterBadgeClass?"":"background:var(--s2);color:var(--t2);border:1px solid var(--bd2)"}">${tabTotal}</span>
+        <span style="font-size:11px;color:var(--mu);font-family:var(--mo)">${activeFilter === "excluded" ? "view only · not included in emails" : showDays ? "day-by-day breakdown" : "click a card above to see day breakdown"}</span>
+        ${visible.length < tabTotal ? `<span style="font-size:10px;color:var(--mu);font-family:var(--mo);border-left:1px solid var(--bd2);padding-left:10px;margin-left:2px">Showing ${visible.length} of ${tabTotal}</span>` : ""}
+      </div>
+      <div class="tbar-right">
+        ${Object.values(columnFilters).some(v=>v) ? `<button class="btn btn-gh btn-sm" onclick="clearAllColFilters()" style="font-size:10px;padding:3px 8px">✕ Clear filters</button>` : ""}
+        <button class="btn btn-gh btn-sm" onclick="exportVisible()" style="font-size:11px;width:190px;justify-content:center" title="Export current view to CSV">Export</button>
+        <div class="search-wrap">
+          <input type="text" placeholder="Search…" value="${searchTerm.replace(/"/g,'&quot;')}" oninput="doSearch(this.value)" id="tbl-search">
+          <span class="si"><svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg></span>
+        </div>
+      </div>
+    </div>
+    <div class="twrap-scroll"><table><thead><tr>
+      ${checkAllTh}
+      <th>${fhdr('id','Emp No')}</th><th>${fhdr('name','Employee')}</th><th>${fhdr('email','Email')}</th><th>${fhdr('location','Location')}</th>${showDays ? "" : `<th>${fhdr('criteria','Criteria')}</th>`}
+      ${showDays ? "" : "<th>Manager Email</th>"}
+      ${dayFilterThs}${showDays?"<th></th>":""}
+    </tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
 }
 
 function toggleSelect(id) {
-  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  const r = results.find(e => String(e.id) === String(id));
+  if (r && isExcluded(r)) return; // excluded employees cannot be toggled
+  if (selected.has(id)) selected.delete(id);
+  else selected.add(id);
   updateSendBtn();
-  const nc = results.filter(r => !r.compliant);
+  // sync select-all checkbox
+  const selectable = results.filter(r => !r.compliant && !isExcluded(r));
   const allChk = document.getElementById("chk-all");
-  if (allChk) allChk.checked = nc.every(r => selected.has(r.id));
-  const selCount = document.getElementById("sel-count");
-  if (selCount) selCount.textContent = selected.size;
+  if (allChk) allChk.checked = selectable.length > 0 && selectable.every(r => selected.has(r.id));
 }
 
 function toggleAll(cb) {
-  const nc = results.filter(r => !r.compliant);
-  nc.forEach(r => {
-    if (cb.checked) selected.add(r.id); else selected.delete(r.id);
+  // Only operate on non-excluded not-met employees
+  const selectable = results.filter(r => !r.compliant && !isExcluded(r));
+  selectable.forEach(r => {
+    if (cb.checked) selected.add(r.id);
+    else selected.delete(r.id);
     const chk = document.getElementById("chk-"+r.id);
     if (chk) chk.checked = cb.checked;
   });
   updateSendBtn();
-  const selCount = document.getElementById("sel-count");
-  if (selCount) selCount.textContent = selected.size;
 }
 
 function updateSendBtn() {
-  const btns = [document.getElementById("btn-send-top")];
-  const hints = [document.getElementById("send-hint-top")];
-  btns.forEach(b => { if(b) b.disabled = selected.size === 0; });
-  hints.forEach(h => { if(h) h.textContent = selected.size === 0 ? "No employees selected" : `${selected.size} email${selected.size!==1?"s":""} will be sent`; });
+  const btn  = document.getElementById("btn-send");
+  const hint = document.getElementById("send-hint");
+  if (!btn) return;
+  // Only count non-excluded selections
+  const sendable = [...selected].filter(id => {
+    const r = results.find(e => String(e.id) === String(id));
+    return r && !isExcluded(r);
+  });
+  btn.disabled = sendable.length === 0;
+  const nc = results.filter(r => !r.compliant && !isExcluded(r));
+  hint.textContent = sendable.length === 0
+    ? "No employees selected"
+    : `${sendable.length} of ${nc.length} email${sendable.length!==1?"s":""} will be sent`;
 }
 
+// ── EXPORT TO CSV ─────────────────────────────────────────────────────────
+function exportVisible() {
+  const DAY_LABEL = { office:"In Office", wfco:"WFCO", leave:"Leave", remote:"Remote",
+    claimed:"Reacted No Bio", excuse:"Excused", no_record:"No Record",
+    half_leave:"Leave", absent:"No Record" };
+  const showDays = activeFilter === "met" || activeFilter === "notmet" || activeFilter === "excluded";
+
+  const hdrs = ["Emp No","Employee","Email","Location"];
+  if (!showDays) hdrs.push("Criteria","Manager Email");
+  if (showDays) weekdays.forEach((d,i) => hdrs.push(DAY_NAMES[i]+" "+d));
+  hdrs.push("Days In Office");
+
+  const escCsv = v => `"${String(v||"").replace(/"/g,'""')}"`;
+  const rows = [hdrs.map(escCsv).join(",")];
+
+  for (const r of visibleRows) {
+    const row = [r.id||"", r.name||"", r.email||"", r.location||""];
+    if (!showDays) { row.push(r.compliant?"Met":"Not Met", r.managerEmail||""); }
+    if (showDays)  weekdays.forEach(d => row.push(DAY_LABEL[r.dayBreakdown?.[d]?.type] || "No Record"));
+    row.push(r.total);
+    rows.push(row.map(escCsv).join(","));
+  }
+
+  const csv  = rows.join("\r\n");
+  const blob = new Blob(["﻿"+csv], {type:"text/csv;charset=utf-8;"});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  const view = activeFilter ? activeFilter : "all";
+  a.href = url; a.download = `attendance_${view}_${(weekLabel||"week").replace(/\s/g,"_")}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── EMAIL PREVIEW ──────────────────────────────────────────────────────────
 function showEmailPreview(r) {
-  document.getElementById("prev-name").textContent = "EMAIL PREVIEW — " + r.name;
+  const lbl = {office:"✓  In Office",leave:"✓  Leave",remote:"–  Work Remote (not counted)",claimed:"–  ⚠ Reacted, No Bio (marked in Ullen Ayyah, no biometric)",no_record:"✗  No Record",half_leave:"✓  Leave",excuse:"✓  Approved excuse",absent:"✗  No Record"};
+  const lines = weekdays.map((d,i) => {
+    const t = r.dayBreakdown[d]?.type || "absent";
+    return `  ${DAY_NAMES[i].padEnd(4)}  ${lbl[t] || "✗  Absent"}`;
+  }).join("\n");
   const missing = Math.max(0, 3 - r.total);
+  const body = `Dear ${r.name},\n\nThis is a reminder regarding the office attendance policy which requires a minimum of 3 days of in-office presence per week (Monday–Friday).\n\nYour attendance summary for the week of ${weekLabel}:\n\n${lines}\n\n  Total effective days : ${r.total} / 5\n  Required             : 3 / 5\n  Shortfall            : ${missing} day${missing!==1?"s":""}\n\nIf you believe this is incorrect, please reach out to your manager or HR.\n\nGoing forward, please ensure you are present in the office for at least 3 working days each week.\n\nRegards,\nHR & Administration`;
+
+  document.getElementById("prev-name").textContent = "EMAIL PREVIEW — " + r.name;
   document.getElementById("prev-meta").innerHTML = `<strong>To:</strong> ${r.email||'<span style="color:var(--rd)">no email on record</span>'}<br><strong>Subject:</strong> Office Attendance Reminder — Week of ${weekLabel}<br><strong>Score:</strong> ${r.total} / 5 &nbsp;·&nbsp; <strong>Shortfall:</strong> ${missing} day(s)`;
-  document.getElementById("prev-body").textContent = buildBody(r);
+  document.getElementById("prev-body").textContent = body;
   document.getElementById("overlay-preview").style.display = "flex";
 }
 function closePreview() { document.getElementById("overlay-preview").style.display = "none"; }
 
-// ── TEMPLATE EDITOR ───────────────────────────────────────────
-function showTemplateModal() {
-  document.getElementById("tpl-textarea").value = emailTemplate;
-  document.getElementById("overlay-template").style.display = "flex";
-}
-function closeTemplateModal() { document.getElementById("overlay-template").style.display = "none"; }
-function saveTemplate() {
-  emailTemplate = document.getElementById("tpl-textarea").value;
-  closeTemplateModal();
-}
-function resetTemplate() {
-  document.getElementById("tpl-textarea").value = DEFAULT_TEMPLATE;
-}
-
+// ── CONFIRM + SEND ─────────────────────────────────────────────────────────
 function showConfirm() {
-  const toSend = results.filter(r => !r.compliant && selected.has(r.id));
-  document.getElementById("confirm-sub").innerHTML = `<strong>${toSend.length}</strong> email${toSend.length!==1?"s":""} will be sent from your Gmail to the employees below.`;
+  const toSend = results.filter(r => !r.compliant && selected.has(r.id) && !isExcluded(r));
+  document.getElementById("confirm-sub").innerHTML = `<strong>${toSend.length}</strong> email${toSend.length!==1?"s":""} will be sent from your Gmail account to the employees below. This cannot be undone.`;
   document.getElementById("confirm-list").innerHTML = toSend.map(r =>
-    `<div class="confirm-list-item">${r.name} &nbsp;<span style="color:var(--t2)">${r.email || "⚠ no email"}</span> &nbsp;<span style="color:var(--rd)">${r.total}/5 days</span></div>`
+    `<div class="confirm-list-item">${r.name} &nbsp;<span style="color:var(--t2)">${r.email || "⚠ no email"}</span> &nbsp;${locationBadge(r.location)}</div>`
   ).join("");
   document.getElementById("progress-area").style.display = "none";
   document.getElementById("confirm-actions").style.display = "flex";
   document.getElementById("overlay-confirm").style.display = "flex";
 }
 
-function closeConfirm() { document.getElementById("overlay-confirm").style.display = "none"; }
+function closeConfirm() {
+  document.getElementById("overlay-confirm").style.display = "none";
+}
 
 function doSend() {
   document.getElementById("confirm-actions").style.display = "none";
@@ -571,55 +949,47 @@ function doSend() {
       document.getElementById("prog-bar").style.background = "var(--rd)";
       document.getElementById("confirm-actions").style.display = "flex";
     })
-    .sendEmails({
-      results: results.filter(r => !r.compliant && selected.has(r.id)),
-      weekLabel,
-      weekdays,
-      emailTemplate,
-    });
+    .sendEmails({ results: results.filter(r => !r.compliant && selected.has(r.id) && !isExcluded(r)), weekLabel, weekdays });
 }
 
 function onSent(res) {
   document.getElementById("prog-bar").style.width = "100%";
   closeConfirm();
+
   if (!res.ok) { showError(res.error); return; }
+
   setStep(3);
-  document.getElementById("actionbar").style.display = "none";
   document.getElementById("screen-preview").style.display = "none";
   document.getElementById("screen-done").style.display = "";
+
   document.getElementById("done-title").textContent = `Done — ${res.sent} email${res.sent!==1?"s":""} sent`;
   document.getElementById("done-grid").innerHTML = `
     <div class="done-stat"><div class="n" style="color:var(--gn)">${res.sent}</div><div class="l">emails sent</div></div>
     <div class="done-stat"><div class="n" style="color:var(--rd)">${res.failed}</div><div class="l">failed</div></div>
     <div class="done-stat"><div class="n" style="color:var(--mu)">${res.noEmail}</div><div class="l">no email on record</div></div>
   `;
-  const nc = results.filter(r => !r.compliant && selected.has(r.id));
+
+  // Log table
+  const nc = results.filter(r => !r.compliant);
   const logRows = nc.map(r => `
     <tr>
       <td class="nm">${r.name}</td>
       <td class="mo">${r.email||"—"}</td>
-      <td class="mo">${r.total} / 5</td>
+      <td>${locationBadge(r.location)}</td>
       <td><span class="badge bgn">✓ Sent</span></td>
     </tr>`).join("");
   document.getElementById("table-log").innerHTML = `
     <div class="tbar"><span class="tbar-title">Email log</span><span class="badge brd">${res.sent} sent</span></div>
-    <table><thead><tr><th>Employee</th><th>Email</th><th>Score</th><th>Status</th></tr></thead>
+    <table><thead><tr><th>Employee</th><th>Email</th><th>Location</th><th>Status</th></tr></thead>
     <tbody>${logRows}</tbody></table>`;
 }
 
-function goPreview() {
-  document.getElementById("screen-done").style.display = "none";
-  document.getElementById("screen-upload").style.display = "none";
-  document.getElementById("screen-preview").style.display = "";
-  document.getElementById("actionbar").style.display = "flex";
-  setStep(2);
-}
-
+// ── NAV HELPERS ────────────────────────────────────────────────────────────
 function goUpload() {
+  activeFilter = null;
   document.getElementById("screen-preview").style.display = "none";
   document.getElementById("screen-done").style.display = "none";
   document.getElementById("screen-upload").style.display = "";
-  document.getElementById("actionbar").style.display = "none";
   setStep(1);
 }
 
